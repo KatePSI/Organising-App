@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>UnionOrganiser — PSI Affiliate Demo v3</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f0f0;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.app{max-width:480px;width:100%;margin:0 auto;background:#fff;min-height:100vh}
+:root{--psi:#C8102E;--psid:#8B0000;--psim:#E63950;--psil:#FDECEA;--psip:#FFF5F5;--psit:#7A0019;--bg2:#f5f5f5;--bg3:#eeeeee;--bord:#e0e0e0;--bord2:#bdbdbd;--t1:#212121;--t2:#616161;--t3:#9e9e9e;--card:#fff;--r:8px;--rl:12px}
+.screen{display:none}.screen.active{display:block}
+.topbar{padding:11px 14px 9px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
+.tb-r{background:var(--psi)}.tb-dk{background:#1a1a1a}
+.topbar h1{color:#fff;font-size:15px;font-weight:600}
+.topbar p{color:rgba(255,255,255,0.6);font-size:11px;margin-top:1px}
+.tbr{display:flex;align-items:center;gap:6px}
+.rb{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600}
+.rb-u{background:rgba(255,255,255,0.2);color:#fff}
+.rb-a{background:#fff;color:var(--psi)}
+.lo{font-size:11px;color:rgba(255,255,255,0.8);cursor:pointer;padding:3px 8px;border:1px solid rgba(255,255,255,0.3);border-radius:6px;background:none}
+.nav{display:flex;background:#fff;border-bottom:1px solid var(--bord);overflow-x:auto;position:sticky;top:42px;z-index:19;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav button{flex:none;padding:9px 11px;font-size:11px;color:var(--t2);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;font-family:inherit}
+.nav button.active{color:var(--psi);border-bottom-color:var(--psi);font-weight:600}
+.nav-a button.active{color:#1a1a1a;border-bottom-color:#1a1a1a}
+.pg{display:none;padding:12px}.pg.active{display:block}
+.card{background:var(--card);border-radius:var(--rl);border:1px solid var(--bord);padding:14px;margin-bottom:10px}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.st{background:var(--bg2);border-radius:var(--r);padding:9px 11px}
+.sl{font-size:11px;color:var(--t2);margin-bottom:2px}
+.sv{font-size:20px;font-weight:700;color:var(--t1)}
+.sv-r{color:var(--psi)}
+.sec{font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;margin:13px 0 7px}
+.sec:first-child{margin-top:0}
+/* clickable rows */
+.mr{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--bord);cursor:pointer;transition:background .1s}
+.mr:hover{background:var(--bg2);border-radius:var(--r);margin:0 -4px;padding:9px 4px}
+.mr:last-child{border-bottom:none}
+.av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.mi{flex:1;min-width:0}
+.mn{font-size:13px;font-weight:600;color:var(--t1)}
+.mn-link{color:var(--psi);text-decoration:underline;text-decoration-color:rgba(200,16,46,0.3)}
+.md{font-size:11px;color:var(--t2)}
+.badge{font-size:10px;padding:2px 7px;border-radius:20px;white-space:nowrap;font-weight:500}
+.b-r{background:#FDECEA;color:#7A0019}.b-b{background:#E3F2FD;color:#0D47A1}
+.b-o{background:#FFF3E0;color:#7B3A00}.b-g{background:#E8F5E9;color:#1B5E20}
+.b-gy{background:#F5F5F5;color:#424242}.b-p{background:#F3E5F5;color:#4A148C}
+.b-won{background:var(--psi);color:#fff}
+.pb{height:5px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-bottom:3px}
+.pf{height:100%;background:var(--psi);border-radius:3px}
+.pl{font-size:11px;color:var(--t2)}
+.cr{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px}
+.chip{padding:4px 9px;border-radius:20px;font-size:11px;cursor:pointer;border:1px solid var(--bord);background:#fff;color:var(--t2)}
+.chip.sel{background:var(--psi);color:#fff;border-color:var(--psi)}
+.toast{background:var(--psi);color:#fff;padding:8px 14px;border-radius:20px;font-size:12px;font-weight:600;text-align:center;margin:6px 0;display:none}
+input[type=text],input[type=tel],input[type=email],input[type=date],input[type=number],select,textarea{width:100%;padding:8px 10px;font-size:13px;border:1px solid var(--bord);border-radius:var(--r);background:#fff;color:var(--t1);font-family:inherit}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--psi)}
+label{font-size:12px;color:var(--t2);display:block;margin-bottom:3px}
+.btn{display:block;width:100%;padding:10px;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;text-align:center;border:none;font-family:inherit;transition:opacity .15s}
+.btn:hover{opacity:.88}
+.btn-p{background:var(--psi);color:#fff}
+.btn-s{background:var(--bg2);color:var(--t1);border:1px solid var(--bord)}
+.btn-or{background:#fff;color:var(--psi);border:2px solid var(--psi)}
+.btn+.btn{margin-top:7px}
+.btn-sm{padding:4px 9px;font-size:11px;border-radius:var(--r);cursor:pointer;border:1px solid var(--bord);background:var(--bg2);color:var(--t1);font-family:inherit}
+.btn-sm-r{padding:4px 9px;font-size:11px;border-radius:var(--r);cursor:pointer;border:1px solid #F09595;background:#FCEBEB;color:#A32D2D;font-family:inherit}
+.tgl{position:relative;width:34px;height:19px;flex-shrink:0}
+.tgl input{opacity:0;width:0;height:0;position:absolute}
+.tgl-t{position:absolute;inset:0;background:#ccc;border-radius:10px;transition:background .2s}
+.tgl input:checked+.tgl-t{background:var(--psi)}
+.tgl-th{position:absolute;top:2px;left:2px;width:15px;height:15px;background:#fff;border-radius:50%;transition:transform .2s;pointer-events:none}
+.tgl input:checked~.tgl-th{transform:translateX(15px)}
+.trow{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bord)}
+.trow:last-child{border-bottom:none}
+/* campaign */
+.ccamp{background:#fff;border-radius:var(--rl);border:1px solid var(--bord);padding:13px;margin-bottom:9px;cursor:pointer;transition:border-color .15s}
+.ccamp:hover{border-color:var(--psim)}
+.ctb{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600}
+.ct-pet{background:#FDECEA;color:#7A0019}.ct-lob{background:#E8F5E9;color:#1B5E20}
+.ct-act{background:#E3F2FD;color:#0D47A1}.ct-med{background:#F3E5F5;color:#4A148C}
+.ct-str{background:#FFF3E0;color:#7B3A00}
+.step-pill{display:inline-flex;align-items:center;gap:5px;background:var(--psil);border-radius:20px;padding:4px 10px;font-size:12px;color:var(--psit);margin-bottom:12px}
+.snum{width:18px;height:18px;border-radius:50%;background:var(--psi);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px}
+.tc{background:#fff;border:1px solid var(--bord);border-radius:var(--rl);padding:10px;cursor:pointer;transition:all .15s}
+.tc:hover,.tc.on{border-color:var(--psi);background:var(--psip)}
+.tc-name{font-size:12px;font-weight:600;color:var(--t1);margin-top:6px}
+.tc-desc{font-size:10px;color:var(--t2);margin-top:2px;line-height:1.3}
+.sig-ctr{background:var(--psi);color:#fff;border-radius:var(--rl);padding:16px;text-align:center;margin-bottom:10px}
+.sig-n{font-size:36px;font-weight:700;line-height:1}
+/* MAP — table layout */
+.map-table-wrap{overflow-x:auto;border-radius:var(--rl);border:1px solid var(--bord);background:#fff;margin-bottom:10px}
+.map-table{width:100%;border-collapse:collapse;min-width:340px}
+.map-table thead th{padding:7px 8px;font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--bord);white-space:nowrap;background:var(--bg2);text-align:left}
+.map-table thead th.ac{text-align:center;padding:7px 5px}
+.map-table tbody tr{border-bottom:1px solid var(--bord);cursor:pointer;transition:background .1s}
+.map-table tbody tr:last-child{border-bottom:none}
+.map-table tbody tr:hover{background:var(--bg2)}
+.map-table tbody td{padding:8px 8px;font-size:12px;color:var(--t1);vertical-align:middle}
+.map-table tbody td.ac{text-align:center;padding:8px 5px}
+.w-name-cell{display:flex;align-items:center;gap:7px}
+.w-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.w-name{font-size:12px;font-weight:600;color:var(--psi);text-decoration:underline;text-decoration-color:rgba(200,16,46,0.3)}
+.ad{width:16px;height:16px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
+.ad-y{background:#43A047}
+.ad-n{background:#eeeeee;border:1px solid #ccc}
+.ad-t{font-size:9px;color:#fff;font-weight:700}
+.sp{font-size:9px;padding:2px 6px;border-radius:20px;white-space:nowrap}
+/* map stats */
+.map-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:10px}
+.ms{background:var(--bg2);border-radius:var(--r);padding:7px 5px;text-align:center}
+.msv{font-size:17px;font-weight:700;color:var(--t1)}
+.msl{font-size:9px;color:var(--t2);margin-top:2px;line-height:1.2}
+.shift-tabs{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap}
+.stab{padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;border:1px solid var(--bord);background:#fff;color:var(--t2);font-family:inherit}
+.stab.active{background:var(--psi);color:#fff;border-color:var(--psi)}
+.fb-row{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:9px}
+.fb{padding:4px 8px;border-radius:20px;font-size:11px;cursor:pointer;border:1px solid var(--bord);background:#fff;color:var(--t2);font-family:inherit}
+.fb.on{background:var(--psi);color:#fff;border-color:var(--psi)}
+/* profile panel */
+.profile-panel{background:#fff;border-radius:var(--rl);border:1px solid var(--bord);padding:16px;margin-bottom:10px}
+.profile-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.profile-av{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0}
+.profile-name{font-size:16px;font-weight:700;color:var(--t1)}
+.profile-role{font-size:12px;color:var(--t2);margin-top:2px}
+.drow{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bord);font-size:12px}
+.drow:last-child{border-bottom:none}
+.dk{color:var(--t2)}
+.dv{font-weight:600;color:var(--t1);text-align:right;max-width:55%}
+/* site card */
+.site-card{background:#fff;border-radius:var(--rl);border:1px solid var(--bord);padding:13px;margin-bottom:9px;cursor:pointer;transition:border-color .15s}
+.site-card:hover{border-color:var(--psim)}
+/* settings */
+.sec-card{background:#fff;border-radius:var(--rl);border:1px solid var(--bord);margin-bottom:9px;overflow:hidden}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;transition:background .1s}
+.sec-hdr:hover{background:var(--bg2)}
+.sec-body{display:none;padding:0 14px 14px;border-top:1px solid var(--bord)}
+.sec-body.open{display:block}
+.ref-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bord)}
+.ref-row:last-child{border-bottom:none}
+.add-inline{display:flex;gap:6px;align-items:center;margin-top:9px;padding-top:9px;border-top:1px solid var(--bord)}
+.add-inline input{flex:1;margin-bottom:0}
+/* login */
+.lw{padding:28px 20px 20px}
+.db{border:1px solid var(--bord);border-radius:var(--rl);padding:11px 13px;cursor:pointer;background:#fff;display:flex;align-items:center;gap:11px;margin-bottom:7px;transition:all .15s}
+.db:hover{background:var(--psip);border-color:var(--psim)}
+.ol{display:flex;align-items:center;gap:9px;margin:12px 0;color:var(--t3);font-size:11px}
+.ol::before,.ol::after{content:'';flex:1;height:1px;background:var(--bord)}
+/* demo banner */
+.demo-banner{background:#1a1a1a;color:#fff;text-align:center;padding:8px 16px;font-size:11px}
+.demo-banner span{color:#EF9F27;font-weight:700}
+/* form sub-nav */
+.sub-nav{display:flex;background:#fff;border-top:1px solid var(--bord);overflow-x:auto;scrollbar-width:none}
+.sub-nav::-webkit-scrollbar{display:none}
+.sub-nav button{flex:none;padding:7px 10px;font-size:10px;color:var(--t2);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;font-family:inherit;font-weight:500}
+.sub-nav button.active{color:var(--psi);border-bottom-color:var(--psi);font-weight:700}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+<div class="demo-banner"><span>DEMO v3</span> — UnionOrganiser for PSI affiliates &nbsp;·&nbsp; Feedback welcome — not for production use</div>
+
+<!-- LOGIN -->
+<div class="screen active" id="sc-login">
+<div style="background:var(--psi);padding:12px 16px;display:flex;align-items:center;gap:10px">
+  <div style="width:32px;height:32px;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--psi);flex-shrink:0">PSI</div>
+  <div><div style="color:#fff;font-size:14px;font-weight:700">UnionOrganiser</div><div style="color:rgba(255,255,255,0.65);font-size:10px">PSI affiliate organising tool — demo v2</div></div>
+</div>
+<div class="lw">
+  <div style="background:#FFF8E1;border:1px solid #FFE082;border-radius:var(--r);padding:10px 12px;font-size:12px;color:#5D4037;margin-bottom:14px;line-height:1.5">Interactive demo — tap any account to explore. No data is saved between sessions. New in v3: working campaign tools + QR codes, event scheduling, training tracking for delegates, campaign types manageable per union, and working map export confirmation.</div>
+  <div style="font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:9px">Sign in as a demo account</div>
+  <div class="db" onclick="login('org1')"><div class="av" style="background:#FDECEA;color:#7A0019">RB</div><div><div style="font-size:13px;font-weight:600;color:var(--t1)">Rina Begum</div><div style="font-size:11px;color:var(--t2)">Organiser · Dhaka Sanitation Workers Union</div></div></div>
+  <div class="db" onclick="login('org2')"><div class="av" style="background:#FFF3E0;color:#7B3A00">MA</div><div><div style="font-size:13px;font-weight:600;color:var(--t1)">Maria Aguilar</div><div style="font-size:11px;color:var(--t2)">Organiser · Manila Health Workers Union</div></div></div>
+  <div class="db" onclick="login('del')"><div class="av" style="background:#F5F5F5;color:#424242">KU</div><div><div style="font-size:13px;font-weight:600;color:var(--t1)">Karim Uddin</div><div style="font-size:11px;color:var(--t2)">Delegate · Dhaka Sanitation Workers Union</div></div></div>
+  <div class="db" onclick="login('admin')"><div class="av" style="background:#1a1a1a;color:#fff">SA</div><div><div style="font-size:13px;font-weight:600;color:var(--t1)">PSI admin</div><div style="font-size:11px;color:var(--t2)">Meta dashboard · all affiliates + settings</div></div></div>
+  <div class="ol">or sign in with credentials</div>
+  <label>Email</label><input type="email" placeholder="you@union.org" style="margin-bottom:8px">
+  <label>Password</label><input type="text" placeholder="••••••••" style="margin-bottom:11px">
+  <button class="btn btn-p" onclick="login('org1')">Sign in</button>
+</div>
+</div>
+
+<!-- UNION SCREEN -->
+<div class="screen" id="sc-union">
+<div class="topbar tb-r">
+  <div><h1 id="u-title">Dhaka Sanitation Workers Union</h1><p id="u-sub">Rina Begum · Organiser</p></div>
+  <div class="tbr"><span class="rb rb-u" id="u-rb">Organiser</span><button class="lo" onclick="logout()">Sign out</button></div>
+</div>
+<nav class="nav" id="u-nav">
+  <button class="active" onclick="uPg('dash',this)">Dashboard</button>
+  <button onclick="uPg('members',this)">Members</button>
+  <button onclick="uPg('map',this)">Workplace map</button>
+  <button onclick="uPg('campaigns',this)">Campaigns</button>
+  <button onclick="uPg('comms',this)">Messages</button>
+  <button onclick="uPg('events',this)">Events</button>
+  <button onclick="uPg('add',this)">+ Add</button>
+  <button onclick="uPg('forms',this)">Mem. form</button>
+  <button onclick="uPg('usettings',this)">Settings</button>
+</nav>
+
+<!-- DASHBOARD -->
+<div class="pg active" id="up-dash">
+  <div style="padding-top:4px"></div>
+  <div class="sg" id="ds-stats"></div>
+  <div class="card"><div class="sec">Active campaigns</div><div id="ds-camps"></div></div>
+  <div class="card">
+    <div class="sec">Recent activity — tap a name to open their profile</div>
+    <div class="mr" onclick="openProfile(1,'dash')"><div class="av" style="background:#FDECEA;color:#7A0019">FR</div><div class="mi"><div class="mn mn-link">Fatema Rahman</div><div class="md">Signed PPE petition · 2h ago</div></div><span style="color:var(--t3);font-size:14px">›</span></div>
+    <div class="mr" onclick="openProfile(2,'dash')"><div class="av" style="background:#FFF3E0;color:#7B3A00">MH</div><div class="mi"><div class="mn mn-link">Mohammed Hossain</div><div class="md">Status updated → Member · 4h ago</div></div><span style="color:var(--t3);font-size:14px">›</span></div>
+    <div class="mr" onclick="openProfile(8,'dash')"><div class="av" style="background:#F3E5F5;color:#4A148C">NI</div><div class="mi"><div class="mn mn-link">Nuru Islam</div><div class="md">Membership form submitted · 6h ago</div></div><span style="color:var(--t3);font-size:14px">›</span></div>
+  </div>
+  <div class="toast" id="t-u"></div>
+</div>
+
+<!-- MEMBERS -->
+<div class="pg" id="up-members">
+  <div style="padding-top:4px"></div>
+  <input type="text" id="ms" placeholder="Search members..." oninput="filterM()" style="margin-bottom:8px">
+  <div class="cr" id="m-chips">
+    <div class="chip sel" onclick="mChip(this,'all')">All</div>
+    <div class="chip" onclick="mChip(this,'member')">Members</div>
+    <div class="chip" onclick="mChip(this,'delegate')">Delegates</div>
+    <div class="chip" onclick="mChip(this,'leader')">Leaders</div>
+    <div class="chip" onclick="mChip(this,'nonmember')">Non-members</div>
+  </div>
+  <div class="card" id="m-list"></div>
+</div>
+
+<!-- WORKPLACE MAP -->
+<div class="pg" id="up-map">
+  <div style="padding-top:4px"></div>
+  <div id="map-site-list"></div>
+  <div id="map-site-view" style="display:none">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <button class="btn-sm" onclick="closeSite()">← Sites</button>
+      <div style="font-size:13px;font-weight:600;color:var(--t1)" id="map-site-name"></div>
+    </div>
+    <div class="shift-tabs" id="shift-tabs"></div>
+    <div class="map-stats" id="map-stats"></div>
+    <div class="fb-row" id="map-filters">
+      <div class="fb on" onclick="setMF(this,'all')">All</div>
+      <div class="fb" onclick="setMF(this,'member')">Members</div>
+      <div class="fb" onclick="setMF(this,'leader')">Leaders</div>
+      <div class="fb" onclick="setMF(this,'delegate')">Delegates</div>
+      <div class="fb" onclick="setMF(this,'active')">Active</div>
+      <div class="fb" onclick="setMF(this,'nonmember')">Not joined</div>
+      <div class="fb" onclick="setMF(this,'unknown')">Not mapped</div>
+    </div>
+    <div class="map-table-wrap" id="map-table-wrap"></div>
+    <div style="display:flex;gap:7px">
+      <button class="btn btn-p" style="flex:1;font-size:12px" onclick="toast('Add worker — coming in full version')">+ Add worker</button>
+      <button class="btn btn-s" style="flex:1;font-size:12px" onclick="showExportConfirm()">Export map</button>
+    </div>
+  </div>
+  <div id="map-worker-view" style="display:none">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <button class="btn-sm" onclick="closeWorker()">← Map</button>
+      <div style="font-size:13px;font-weight:600;color:var(--t1)" id="mwv-title"></div>
+    </div>
+    <div id="mwv-content"></div>
+    <div class="card"><div class="sec" style="margin-top:0">Update status</div>
+      <label>Union status</label><select id="mwv-status" style="margin-bottom:9px"></select>
+      <label>Organiser note</label><input type="text" id="mwv-note" placeholder="Add a note..." style="margin-bottom:9px">
+      <button class="btn btn-p" onclick="saveStatus()">Save update</button>
+    </div>
+    <div class="toast" id="t-mwv"></div>
+  </div>
+  <div class="toast" id="t-map"></div>
+</div>
+
+<!-- CAMPAIGNS -->
+<div class="pg" id="up-campaigns">
+  <div style="padding-top:4px"></div>
+  <div id="cv-list">
+    <button class="btn btn-p" style="margin-bottom:10px" onclick="showCB()">+ New campaign</button>
+    <div id="camp-cards"></div>
+  </div>
+  <div id="cv-builder" style="display:none">
+    <button class="btn-sm" style="margin-bottom:10px" onclick="hideCB()">← Back to campaigns</button>
+    <div id="cb1"><div class="step-pill"><div class="snum">1</div>Campaign basics</div>
+    <div class="card">
+      <label>Campaign title</label><input type="text" id="cb-ttl" placeholder="e.g. PPE for all workers" style="margin-bottom:9px">
+      <label>Campaign type</label>
+      <div class="cr" id="ct-chips">
+        <div class="chip sel" onclick="selCT(this,'pet')">Petition</div>
+        <div class="chip" onclick="selCT(this,'act')">Day of action</div>
+        <div class="chip" onclick="selCT(this,'lob')">Negotiation</div>
+        <div class="chip" onclick="selCT(this,'med')">Media</div>
+        <div class="chip" onclick="selCT(this,'str')">Work stoppage</div>
+      </div>
+      <label>Demand / goal</label>
+      <textarea id="cb-goal" rows="2" placeholder="What are you fighting for?" style="resize:vertical;margin-bottom:9px"></textarea>
+      <label>Target date</label><input type="date" style="margin-bottom:9px">
+      <button class="btn btn-p" onclick="cbNext(2)">Next: Tools →</button>
+    </div></div>
+    <div id="cb2" style="display:none"><div class="step-pill"><div class="snum">2</div>Campaign tools</div>
+    <div class="tool-grid">
+      <div class="tc on" id="tool-petition" onclick="toggleTool(this,'petition')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="1" width="10" height="12" rx="1.5" stroke="#C8102E" stroke-width="1.2"/><line x1="4" y1="4.5" x2="10" y2="4.5" stroke="#C8102E" stroke-width=".9"/><line x1="4" y1="6.5" x2="10" y2="6.5" stroke="#C8102E" stroke-width=".9"/><line x1="4" y1="8.5" x2="8" y2="8.5" stroke="#C8102E" stroke-width=".9"/></svg><div class="tc-name">Petition</div><div class="tc-desc">Collect signatures with QR code</div></div>
+      <div class="tc" id="tool-tracker" onclick="toggleTool(this,'tracker')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="8" width="3" height="5" rx=".8" fill="#C8102E"/><rect x="5.5" y="5.5" width="3" height="7.5" rx=".8" fill="#C8102E"/><rect x="10" y="3" width="3" height="10" rx=".8" fill="#C8102E"/></svg><div class="tc-name">Action tracker</div><div class="tc-desc">Log per-worker actions</div></div>
+      <div class="tc" id="tool-sms" onclick="toggleTool(this,'sms')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="8" rx="1.5" stroke="#C8102E" stroke-width="1.2"/><path d="M4 12l3-2 3 2" stroke="#C8102E" stroke-width=".9" fill="none"/></svg><div class="tc-name">SMS blast</div><div class="tc-desc">Campaign updates to all</div></div>
+      <div class="tc" id="tool-leaflet" onclick="toggleTool(this,'leaflet')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 1h8l3 3v9H2V1z" stroke="#C8102E" stroke-width="1.2"/><path d="M10 1v3h3" stroke="#C8102E" stroke-width=".9"/></svg><div class="tc-name">Leaflet</div><div class="tc-desc">Printable campaign flyer</div></div>
+      <div class="tc" id="tool-pledge" onclick="toggleTool(this,'pledge')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5" r="3" stroke="#C8102E" stroke-width="1.2"/><path d="M7 8v4" stroke="#C8102E" stroke-width="1.1" stroke-linecap="round"/></svg><div class="tc-name">Pledge wall</div><div class="tc-desc">Public commitments</div></div>
+      <div class="tc" id="tool-escalation" onclick="toggleTool(this,'escalation')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="3" cy="7" r="1.5" fill="#C8102E"/><circle cx="7" cy="7" r="1.5" fill="#C8102E"/><circle cx="11" cy="7" r="1.5" fill="#C8102E"/></svg><div class="tc-name">Escalation ladder</div><div class="tc-desc">Staged next steps</div></div>
+    </div>
+    <div style="display:flex;gap:7px"><button class="btn btn-s" style="flex:1" onclick="cbNext(1)">← Back</button><button class="btn btn-p" style="flex:1" id="cb2-next" onclick="cbNext(3)">Next: Petition setup →</button></div></div>
+    <div id="cb3" style="display:none"><div class="step-pill"><div class="snum">3</div><span id="cb3-label">Petition &amp; escalation</span></div>
+    <div class="card" id="cb3-petition">
+      <label>Petition statement</label>
+      <textarea rows="3" placeholder="We the undersigned workers call on management to..." style="resize:vertical;margin-bottom:9px"></textarea>
+      <label>Signature target</label><input type="number" id="cb-tgt" placeholder="e.g. 50" min="1" style="margin-bottom:9px">
+      <label>Addressed to</label><input type="text" id="cb-addr" placeholder="e.g. City Corporation management" style="margin-bottom:9px">
+    </div>
+    <div class="card"><div class="sec" style="margin-top:0">Escalation ladder</div>
+      <div style="display:flex;gap:7px;align-items:center;margin-bottom:7px"><div style="width:22px;height:22px;border-radius:50%;background:var(--psi);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div><div style="flex:1;padding:7px 9px;background:var(--bg2);border-radius:var(--r);font-size:12px;color:var(--t1)">Submit petition to management</div></div>
+      <div style="display:flex;gap:7px;align-items:center;margin-bottom:7px"><div style="width:22px;height:22px;border-radius:50%;background:var(--psim);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div><div style="flex:1;padding:7px 9px;background:var(--bg2);border-radius:var(--r);font-size:12px;color:var(--t1)">Formal grievance filing</div></div>
+      <div style="display:flex;gap:7px;align-items:center"><div style="width:22px;height:22px;border-radius:50%;background:#7A0019;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div><input type="text" placeholder="Add next step..." style="flex:1;margin-bottom:0"></div>
+      <button class="btn btn-s" style="font-size:12px;margin-top:8px" onclick="toast('Step added')">+ Add step</button>
+    </div>
+    <div style="display:flex;gap:7px"><button class="btn btn-s" style="flex:1" onclick="cbNext(2)">← Back</button><button class="btn btn-p" style="flex:1" onclick="launchCamp()">Launch campaign</button></div></div>
+  </div>
+  <div id="cv-detail" style="display:none">
+    <button class="btn-sm" style="margin-bottom:10px" onclick="hideCampDetail()">← Back to campaigns</button>
+    <div class="sig-ctr"><div class="sig-n" id="cd-sigs">38</div><div style="font-size:11px;opacity:.85;margin-top:3px">signatures of <span id="cd-tgt">50</span> target</div><div style="height:5px;background:rgba(255,255,255,0.3);border-radius:3px;margin-top:10px;overflow:hidden"><div id="cd-bar" style="height:100%;background:#fff;border-radius:3px"></div></div></div>
+    <div class="card"><div class="sec" style="margin-top:0">Campaign tools — tap to use</div>
+      <button class="btn btn-p" style="margin-bottom:7px" onclick="showPetitionView()">View &amp; share petition + QR code</button>
+      <button class="btn btn-s" style="margin-bottom:7px" onclick="goToCommsWithCampaign()">Send campaign SMS blast →</button>
+      <button class="btn btn-s" style="margin-bottom:7px" onclick="toast('Generating printable leaflet PDF...')">Generate leaflet / flyer</button>
+      <button class="btn btn-s" style="margin-bottom:7px" onclick="goToMapForCampaign()">View action tracker on map →</button>
+      <button class="btn btn-or" onclick="showEscalationView()">Escalation ladder</button>
+    </div>
+    <div class="card"><div class="sec" style="margin-top:0">Recent signatories — tap to open profile</div>
+      <div class="mr" onclick="openProfile(1,'camp')"><div class="av" style="background:#FDECEA;color:#7A0019">FR</div><div class="mi"><div class="mn mn-link">Fatema Rahman</div><div class="md">Zone 3 · signed today</div></div><span style="color:var(--t3);font-size:14px">›</span></div>
+      <div class="mr" onclick="openProfile(2,'camp')"><div class="av" style="background:#FFF3E0;color:#7B3A00">MH</div><div class="mi"><div class="mn mn-link">Mohammed Hossain</div><div class="md">Zone 3 · signed today</div></div><span style="color:var(--t3);font-size:14px">›</span></div>
+      <div class="mr" onclick="openProfile(3,'camp')"><div class="av" style="background:#E3F2FD;color:#0D47A1">KU</div><div class="mi"><div class="mn mn-link">Karim Uddin</div><div class="md">Zone 3 · signed yesterday</div></div><span style="color:var(--t3);font-size:14px">›</span></div>
+    </div>
+    <div class="toast" id="t-cd"></div>
+  </div>
+  <!-- PETITION VIEW -->
+  <div id="cv-petition" style="display:none">
+    <button class="btn-sm" style="margin-bottom:10px" onclick="hidePetitionView()">← Back to campaign</button>
+    <div class="card">
+      <div style="font-size:14px;font-weight:700;color:var(--t1);margin-bottom:4px">PPE &amp; safety equipment</div>
+      <div style="font-size:12px;color:var(--t2);margin-bottom:12px">38 of 50 signatures · share this link or QR code with workers</div>
+      <div style="background:var(--bg2);border-radius:var(--r);padding:10px;font-style:italic;font-size:12px;color:var(--t1);margin-bottom:12px;line-height:1.5">"We the undersigned workers of the Dhaka Sanitation Department call on management to provide full PPE equipment including gloves, masks, and protective clothing to all waste collection workers immediately."</div>
+      <div style="background:#fff;border:1px solid var(--bord);border-radius:var(--r);padding:16px;text-align:center;margin-bottom:12px">
+        <div style="width:120px;height:120px;margin:0 auto 8px;background:var(--bg2);border-radius:var(--r);display:flex;align-items:center;justify-content:center;border:1px solid var(--bord)">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <rect x="5" y="5" width="30" height="30" rx="3" fill="#1a1a1a"/>
+            <rect x="10" y="10" width="20" height="20" rx="1" fill="#fff"/>
+            <rect x="14" y="14" width="12" height="12" rx="1" fill="#1a1a1a"/>
+            <rect x="45" y="5" width="30" height="30" rx="3" fill="#1a1a1a"/>
+            <rect x="50" y="10" width="20" height="20" rx="1" fill="#fff"/>
+            <rect x="54" y="14" width="12" height="12" rx="1" fill="#1a1a1a"/>
+            <rect x="5" y="45" width="30" height="30" rx="3" fill="#1a1a1a"/>
+            <rect x="10" y="50" width="20" height="20" rx="1" fill="#fff"/>
+            <rect x="14" y="54" width="12" height="12" rx="1" fill="#1a1a1a"/>
+            <rect x="45" y="45" width="8" height="8" fill="#1a1a1a"/>
+            <rect x="57" y="45" width="8" height="8" fill="#1a1a1a"/>
+            <rect x="45" y="57" width="8" height="8" fill="#1a1a1a"/>
+            <rect x="57" y="57" width="18" height="8" fill="#1a1a1a"/>
+            <rect x="67" y="45" width="8" height="8" fill="#1a1a1a"/>
+          </svg>
+        </div>
+        <div style="font-size:11px;color:var(--t2);margin-bottom:4px">Scan to sign the petition</div>
+        <div style="font-family:monospace;font-size:11px;color:var(--psi);font-weight:700">unionorg.app/sign/dhaka-ppe-2026</div>
+      </div>
+      <div style="display:flex;gap:7px">
+        <button class="btn btn-p" style="flex:1;font-size:12px" onclick="toast('Link copied to clipboard')">Copy link</button>
+        <button class="btn btn-s" style="flex:1;font-size:12px" onclick="toast('QR code downloaded as image')">Download QR</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="sec" style="margin-top:0">Send petition link by SMS</div>
+      <div class="cr"><div class="chip sel" onclick="this.classList.toggle('sel')">Non-members</div><div class="chip" onclick="this.classList.toggle('sel')">All members</div><div class="chip" onclick="this.classList.toggle('sel')">Zone 3</div></div>
+      <button class="btn btn-p" onclick="toast('Petition SMS sent to 29 non-members')">Send petition SMS</button>
+    </div>
+  </div>
+  <!-- ESCALATION VIEW -->
+  <div id="cv-escalation" style="display:none">
+    <button class="btn-sm" style="margin-bottom:10px" onclick="hideEscalationView()">← Back to campaign</button>
+    <div class="card">
+      <div style="font-size:14px;font-weight:700;color:var(--t1);margin-bottom:4px">Escalation ladder</div>
+      <div style="font-size:12px;color:var(--t2);margin-bottom:14px">PPE &amp; safety equipment campaign</div>
+      <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:14px">
+        <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0"><div style="width:28px;height:28px;border-radius:50%;background:var(--psi);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">1</div><div style="width:2px;height:30px;background:var(--bord);margin-top:4px"></div></div>
+        <div style="flex:1;padding-top:4px"><div style="font-size:13px;font-weight:600;color:var(--t1)">Submit petition to management</div><div style="font-size:11px;color:var(--t2);margin-top:2px">Target: 50 signatures — currently 38</div><span class="badge b-o" style="margin-top:5px;display:inline-block">In progress</span></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:14px">
+        <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0"><div style="width:28px;height:28px;border-radius:50%;background:var(--bord2);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">2</div><div style="width:2px;height:30px;background:var(--bord);margin-top:4px"></div></div>
+        <div style="flex:1;padding-top:4px"><div style="font-size:13px;font-weight:600;color:var(--t2)">Formal grievance filing</div><div style="font-size:11px;color:var(--t3);margin-top:2px">If management doesn't respond within 14 days</div><span class="badge b-gy" style="margin-top:5px;display:inline-block">Not yet</span></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0"><div style="width:28px;height:28px;border-radius:50%;background:var(--bord2);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">3</div></div>
+        <div style="flex:1;padding-top:4px"><div style="font-size:13px;font-weight:600;color:var(--t2)">Work-to-rule action</div><div style="font-size:11px;color:var(--t3);margin-top:2px">Coordinated collective action</div><span class="badge b-gy" style="margin-top:5px;display:inline-block">Not yet</span></div>
+      </div>
+    </div>
+    <button class="btn btn-s" onclick="toast('Escalation step marked as complete')">Mark step 1 as complete</button>
+  </div>
+  <div class="toast" id="t-camp"></div>
+</div>
+
+<!-- COMMS -->
+<div class="pg" id="up-comms">
+  <div style="padding-top:4px"></div>
+  <div class="card"><div class="sec" style="margin-top:0">Send group message</div>
+    <div class="cr"><div class="chip sel" onclick="this.classList.toggle('sel')">All members</div><div class="chip" onclick="this.classList.toggle('sel')">Delegates</div><div class="chip" onclick="this.classList.toggle('sel')">Zone 3</div><div class="chip" onclick="this.classList.toggle('sel')">Non-members</div></div>
+    <select style="margin-bottom:9px"><option>SMS</option><option>WhatsApp</option><option>Email</option></select>
+    <textarea rows="3" placeholder="Type message..." style="resize:vertical;margin-bottom:9px"></textarea>
+    <button class="btn btn-p" onclick="toast('Message sent to selected recipients')">Send</button>
+  </div>
+  <div class="sec">Sent messages</div>
+  <div class="card">
+    <div class="mr" style="cursor:default"><div class="av" style="background:#FDECEA;color:#7A0019;font-size:13px">S</div><div class="mi"><div class="mn">SMS → All members (47)</div><div class="md">Meeting Sat 9am at depot · today 8:15am</div></div></div>
+    <div class="mr" style="cursor:default"><div class="av" style="background:#F5F5F5;color:#424242;font-size:13px">W</div><div class="mi"><div class="mn">WhatsApp → Non-members (29)</div><div class="md">Membership form link · yesterday 3pm</div></div></div>
+    <div class="mr" style="cursor:default"><div class="av" style="background:#FDECEA;color:#7A0019;font-size:13px">E</div><div class="mi"><div class="mn">Email → Delegates (6)</div><div class="md">Delegate briefing notes · Mon 6:30pm</div></div></div>
+  </div>
+</div>
+
+<!-- EVENTS -->
+<div class="pg" id="up-events">
+  <div style="padding-top:4px"></div>
+  <div id="ev-list-view">
+    <button class="btn btn-p" style="margin-bottom:10px" onclick="showEvForm()">+ Schedule event</button>
+    <div class="card" id="ev-list"></div>
+  </div>
+  <div id="ev-form-view" style="display:none">
+    <button class="btn-sm" style="margin-bottom:10px" onclick="hideEvForm()">← Back to events</button>
+    <div class="card">
+      <div style="font-size:14px;font-weight:700;color:var(--t1);margin-bottom:12px">Schedule new event</div>
+      <label>Event title</label><input type="text" id="ev-title" placeholder="e.g. General meeting" style="margin-bottom:9px">
+      <label>Date</label><input type="date" id="ev-date" style="margin-bottom:9px">
+      <label>Time</label><input type="text" id="ev-time" placeholder="e.g. 9:00am" style="margin-bottom:9px">
+      <label>Location</label><input type="text" id="ev-loc" placeholder="e.g. Depot hall, Zone 3" style="margin-bottom:9px">
+      <label>Who is invited</label>
+      <div class="cr" id="ev-invitees">
+        <div class="chip sel" onclick="this.classList.toggle('sel')">All members</div>
+        <div class="chip" onclick="this.classList.toggle('sel')">Delegates only</div>
+        <div class="chip" onclick="this.classList.toggle('sel')">Zone 3</div>
+        <div class="chip" onclick="this.classList.toggle('sel')">Zone 4</div>
+        <div class="chip" onclick="this.classList.toggle('sel')">New members</div>
+      </div>
+      <label>Agenda / notes</label>
+      <textarea rows="2" id="ev-agenda" placeholder="e.g. Agenda: PPE update, wage petition progress" style="resize:vertical;margin-bottom:9px"></textarea>
+    </div>
+    <div class="card">
+      <div class="sec" style="margin-top:0">Notify invitees</div>
+      <div style="font-size:12px;color:var(--t2);margin-bottom:10px;line-height:1.5">Choose how to let workers know about this event.</div>
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--bord)">
+        <input type="checkbox" id="ev-sms" checked style="width:16px;height:16px;flex-shrink:0;margin-top:2px">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--t1)">Send SMS to invitees</div>
+          <div style="font-size:11px;color:var(--t2);margin-top:2px">Workers receive a text message with the event details immediately on saving.</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0">
+        <input type="checkbox" id="ev-cal" checked style="width:16px;height:16px;flex-shrink:0;margin-top:2px">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--t1)">Generate calendar invite (.ics)</div>
+          <div style="font-size:11px;color:var(--t2);margin-top:2px">Creates a file that works with Google Calendar, Outlook, and Apple Calendar. Can be sent separately or included in the SMS.</div>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-p" onclick="saveEvent()">Save &amp; send notifications</button>
+    <div class="toast" id="t-ev"></div>
+  </div>
+</div>
+
+<!-- ADD WORKER -->
+<div class="pg" id="up-add">
+  <div style="padding-top:4px"></div>
+  <div class="card">
+    <div style="font-size:14px;font-weight:700;color:var(--t1);margin-bottom:11px">Register new worker</div>
+    <label>Full name</label><input type="text" placeholder="Full name" style="margin-bottom:9px">
+    <label>Phone</label><input type="tel" placeholder="+880 ..." style="margin-bottom:9px">
+    <label>Site / shift</label><select style="margin-bottom:9px"><option>Zone 3 Depot — Morning</option><option>Zone 3 Depot — Afternoon</option><option>Zone 4 Transfer — Day</option><option>Admin Office</option></select>
+    <label>Union status</label><select style="margin-bottom:9px"><option>Member</option><option>Delegate</option><option>Organic leader</option><option>Active (non-member)</option><option>Non-member</option><option>Form given</option></select>
+    <label>Campaign actions taken</label>
+    <div class="cr"><div class="chip" onclick="this.classList.toggle('sel')">Signed PPE petition</div><div class="chip" onclick="this.classList.toggle('sel')">Signed wage petition</div><div class="chip" onclick="this.classList.toggle('sel')">Attended meeting</div></div>
+    <textarea rows="2" style="resize:vertical;margin-bottom:11px" placeholder="Organiser notes..."></textarea>
+    <button class="btn btn-p" onclick="toast('Worker registered successfully')">Register worker</button>
+    <button class="btn btn-s" style="margin-top:7px" onclick="toast('Membership form SMS sent')">Send membership form</button>
+  </div>
+</div>
+
+<!-- MEMBERSHIP FORM -->
+<div class="pg" id="up-forms">
+  <div style="padding-top:4px"></div>
+  <nav class="sub-nav" style="margin:-12px -12px 12px;border-top:1px solid var(--bord)">
+    <button class="active" id="fb0" onclick="fPg('builder',this)">Form builder</button>
+    <button id="fb1" onclick="fPg('preview',this)">Preview</button>
+    <button id="fb2" onclick="fPg('send',this)">Send</button>
+    <button id="fb3" onclick="fPg('subs',this)">Submissions</button>
+  </nav>
+  <div id="fp-builder">
+    <div class="card"><div class="sec" style="margin-top:0">Union branding</div>
+      <label>Union name on form</label><input type="text" id="form-uname" value="Dhaka Sanitation Workers Union" style="margin-bottom:9px">
+      <label>Authorisation statement</label>
+      <textarea rows="3" style="resize:vertical">I authorise the Dhaka Sanitation Workers Union to act as my representative in all employment matters, including wage negotiations, workplace safety, and conditions of employment.</textarea>
+    </div>
+    <div class="card"><div class="sec" style="margin-top:0">Core fields <span class="badge b-gy" style="text-transform:none;letter-spacing:0">always included</span></div><div id="core-flds"></div></div>
+    <div class="card"><div class="sec" style="margin-top:0">Optional fields</div>
+      <div id="opt-flds"></div>
+    </div>
+    <button class="btn btn-p" onclick="toast('Form template saved successfully')">Save form template</button>
+  </div>
+  <div id="fp-preview" style="display:none">
+    <div style="background:var(--bg2);border-radius:var(--rl);padding:11px">
+      <div style="background:var(--psi);color:#fff;padding:10px 13px;border-radius:var(--r);margin-bottom:10px;font-size:12px;font-weight:700">Dhaka Sanitation Workers Union<br><span style="font-size:10px;font-weight:400;opacity:.8">Membership application form</span></div>
+      <label>Full name *</label><input type="text" placeholder="Your full name" style="margin-bottom:9px">
+      <label>Phone number *</label><input type="tel" placeholder="+880 ..." style="margin-bottom:9px">
+      <label>Worker / ID number *</label><input type="text" placeholder="Your employer ID" style="margin-bottom:9px">
+      <label>Job title / grade *</label><input type="text" placeholder="e.g. Waste collector Grade 2" style="margin-bottom:9px">
+      <label>Employment basis *</label><select style="margin-bottom:9px"><option value="">Select...</option><option>Full-time</option><option>Part-time</option><option>Casual</option><option>Contractual</option></select>
+      <label>Date of birth <span style="font-size:10px;color:var(--t3)">(optional)</span></label><input type="date" style="margin-bottom:9px">
+      <div style="background:#E8F5E9;border:1px solid #81C784;border-radius:var(--r);padding:9px;font-size:11px;color:#1B5E20;margin-bottom:9px;line-height:1.5">I authorise the Dhaka Sanitation Workers Union to act as my representative in all employment matters.</div>
+      <div style="border:1px solid var(--bord);border-radius:var(--r);height:50px;display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:11px;margin-bottom:9px;cursor:pointer;background:#fff" onclick="this.innerHTML='<span style=\'color:#1B5E20;font-size:13px;font-weight:600\'>✓ Signed</span>';this.style.background='#E8F5E9';this.style.borderColor='#81C784'">Tap here to sign with your finger</div>
+      <button class="btn btn-p" onclick="toast('Application submitted — added as pending member')">Submit application</button>
+    </div>
+  </div>
+  <div id="fp-send" style="display:none">
+    <div class="card"><div class="sec" style="margin-top:0">Send form link by SMS</div>
+      <div style="background:#FDECEA;border-radius:var(--rl);padding:11px;font-size:12px;color:#7A0019;margin-bottom:9px;border:1px solid var(--psim);line-height:1.5">Join the Dhaka Sanitation Workers Union — complete your membership form: <span style="text-decoration:underline;font-weight:700">unionorg.app/join/dhaka-swu</span></div>
+      <div class="cr"><div class="chip sel" onclick="this.classList.toggle('sel')">Non-members</div><div class="chip" onclick="this.classList.toggle('sel')">Form given</div></div>
+      <button class="btn btn-p" onclick="toast('SMS sent to 29 non-members')">Send SMS with form link</button>
+    </div>
+    <div class="card"><div class="sec" style="margin-top:0">Assisted entry</div>
+      <div style="font-size:12px;color:var(--t2);margin-bottom:9px;line-height:1.5">Fill in on behalf of a worker who doesn't have a phone or prefers paper.</div>
+      <button class="btn btn-s" onclick="fPg('preview',document.getElementById('fb1'))">Open form for assisted entry</button>
+    </div>
+  </div>
+  <div id="fp-subs" style="display:none">
+    <div class="sg"><div class="st"><div class="sl">Total submitted</div><div class="sv sv-r">23</div></div><div class="st"><div class="sl">Pending review</div><div class="sv">4</div></div></div>
+    <div class="card"><div class="sec" style="margin-top:0">Recent submissions — tap to open profile</div>
+      <div class="mr" onclick="openProfile(1,'forms')"><div class="av" style="background:#FDECEA;color:#7A0019">FR</div><div class="mi"><div class="mn mn-link">Fatema Rahman</div><div class="md">Today, 9:14am · SMS link</div></div><span class="badge b-g">approved</span></div>
+      <div class="mr" onclick="openProfile(8,'forms')"><div class="av" style="background:#F3E5F5;color:#4A148C">NI</div><div class="mi"><div class="mn mn-link">Nuru Islam</div><div class="md">Today, 7:30am · Assisted</div></div><span class="badge b-o">pending</span></div>
+      <div class="mr" onclick="openProfile(1,'forms')"><div class="av" style="background:#FDECEA;color:#7A0019">DM</div><div class="mi"><div class="mn mn-link">Delwar Mia</div><div class="md">Yesterday · SMS link</div></div><span class="badge b-g">approved</span></div>
+    </div>
+    <div style="display:flex;gap:7px"><button class="btn btn-s" style="flex:1;font-size:12px" onclick="toast('Downloading CSV...')">Export CSV</button><button class="btn btn-s" style="flex:1;font-size:12px" onclick="toast('Generating PDF...')">Export PDF</button></div>
+  </div>
+</div>
+
+<!-- WORKER PROFILE PAGE -->
+<div class="pg" id="up-profile">
+  <div style="padding-top:4px"></div>
+  <button class="btn-sm" id="profile-back" style="margin-bottom:10px">← Back</button>
+  <div id="profile-tabs" style="display:flex;gap:0;border:1px solid var(--bord);border-radius:var(--r);overflow:hidden;margin-bottom:10px">
+    <button id="ptab-details" onclick="showProfileTab('details')" style="flex:1;padding:8px;font-size:12px;font-weight:600;border:none;background:var(--psi);color:#fff;cursor:pointer;font-family:inherit">Details</button>
+    <button id="ptab-training" onclick="showProfileTab('training')" style="flex:1;padding:8px;font-size:12px;font-weight:600;border:none;background:var(--bg2);color:var(--t2);cursor:pointer;font-family:inherit;border-left:1px solid var(--bord)">Training</button>
+  </div>
+  <div id="profile-tab-details">
+    <div id="profile-content"></div>
+    <div class="card"><div class="sec" style="margin-top:0">Update status</div>
+      <label>Union status</label><select id="prof-status" style="margin-bottom:9px"></select>
+      <label>Organiser note</label><input type="text" id="prof-note" placeholder="Add a note..." style="margin-bottom:9px">
+      <button class="btn btn-p" onclick="saveProfStatus()">Save update</button>
+    </div>
+  </div>
+  <div id="profile-tab-training" style="display:none">
+    <div class="card">
+      <div class="sec" style="margin-top:0">Training record</div>
+      <div id="training-list"></div>
+      <button class="btn btn-p" style="margin-top:10px" onclick="showAddTraining()">+ Log completed training</button>
+    </div>
+    <div id="add-training-form" style="display:none">
+      <div class="card">
+        <div style="font-size:13px;font-weight:700;color:var(--t1);margin-bottom:10px">Log training</div>
+        <label>Course</label>
+        <select id="training-course" style="margin-bottom:9px">
+          <option>Organising fundamentals</option>
+          <option>OSH — occupational safety &amp; health</option>
+          <option>Collective bargaining</option>
+          <option>Grievance handling</option>
+          <option>Women's leadership</option>
+          <option>Health &amp; safety rep</option>
+          <option>Delegate skills</option>
+          <option>Other (specify below)</option>
+        </select>
+        <label>Other course name (if not listed)</label>
+        <input type="text" placeholder="Course name..." style="margin-bottom:9px">
+        <label>Date completed</label>
+        <input type="date" id="training-date" style="margin-bottom:9px">
+        <label>Status</label>
+        <select id="training-status" style="margin-bottom:9px">
+          <option>Completed</option>
+          <option>Scheduled — not yet done</option>
+          <option>In progress</option>
+        </select>
+        <div style="display:flex;gap:7px">
+          <button class="btn btn-p" style="flex:1" onclick="saveTraining()">Save</button>
+          <button class="btn btn-s" style="flex:1" onclick="hideAddTraining()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="t-prof"></div>
+</div>
+<!-- UNION SETTINGS -->
+<div class="pg" id="up-usettings">
+  <div style="padding-top:4px"></div>
+  <div style="font-size:13px;color:var(--t2);margin-bottom:12px;line-height:1.5">Manage settings specific to your union. Changes only affect your union's workspace.</div>
+  <div class="card">
+    <div class="sec" style="margin-top:0">Campaign types — your union</div>
+    <div style="font-size:12px;color:var(--t2);margin-bottom:10px;line-height:1.5">These types appear when creating a new campaign. You can add types specific to your sector alongside the PSI defaults.</div>
+    <div id="union-camp-types"></div>
+    <div style="display:flex;gap:6px;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--bord)">
+      <input type="text" id="new-ct-input" placeholder="Add campaign type..." style="flex:1;margin-bottom:0">
+      <button class="btn-sm" style="background:var(--psi);color:#fff;border-color:var(--psi);flex-shrink:0" onclick="addUnionCampType()">Add</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="sec" style="margin-top:0">Training catalogue — your union</div>
+    <div style="font-size:12px;color:var(--t2);margin-bottom:10px;line-height:1.5">Add union-specific training courses alongside the PSI default catalogue.</div>
+    <div id="union-training-types"></div>
+    <div style="display:flex;gap:6px;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--bord)">
+      <input type="text" id="new-tr-input" placeholder="Add training course..." style="flex:1;margin-bottom:0">
+      <button class="btn-sm" style="background:var(--psi);color:#fff;border-color:var(--psi);flex-shrink:0" onclick="addUnionTraining()">Add</button>
+    </div>
+  </div>
+  <div class="toast" id="t-uset"></div>
+</div>
+
+<!-- EXPORT CONFIRM MODAL -->
+<div id="export-confirm" style="display:none;background:rgba(0,0,0,0.4);padding:30px 16px;min-height:300px;display:none;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:var(--rl);border:1px solid var(--bord);padding:20px;width:100%">
+    <div style="font-size:15px;font-weight:700;color:var(--t1);margin-bottom:8px">Export workplace map</div>
+    <div style="font-size:13px;color:var(--t2);margin-bottom:12px;line-height:1.5">This will generate a printable PDF of the current map view including worker names, statuses, and campaign actions.</div>
+    <div style="background:#FFF3E0;border:1px solid #FFE082;border-radius:var(--r);padding:10px 12px;font-size:12px;color:#5D4037;margin-bottom:14px;line-height:1.5">
+      <strong>Confidential.</strong> This document contains sensitive union organising information. Please store printed copies securely and do not distribute beyond authorised organisers.
+    </div>
+    <div style="font-size:12px;color:var(--t2);margin-bottom:12px">The PDF will be labelled <em>Confidential — not for distribution</em> and include today's date.</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-p" style="flex:1" onclick="doExport()">Generate PDF</button>
+      <button class="btn btn-s" style="flex:1" onclick="hideExportConfirm()">Cancel</button>
+    </div>
+  </div>
+</div>
+</div>
+<div class="screen" id="sc-admin">
+<div class="topbar tb-dk">
+  <div><div style="display:flex;align-items:center;gap:8px"><div style="width:18px;height:18px;background:var(--psi);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff;font-weight:800">PSI</div><h1>UnionOrganiser</h1></div><p>PSI admin · all affiliates</p></div>
+  <div class="tbr"><span class="rb rb-a">PSI admin</span><button class="lo" onclick="logout()">Sign out</button></div>
+</div>
+<nav class="nav nav-a">
+  <button class="active" onclick="aPg('overview',this)">Overview</button>
+  <button onclick="aPg('affiliates',this)">Affiliates</button>
+  <button onclick="aPg('trends',this)">Trends</button>
+  <button onclick="aPg('settings',this)">Settings</button>
+  <button onclick="aPg('addaff',this)">+ Add affiliate</button>
+</nav>
+<div class="pg active" id="ap-overview">
+  <div style="padding-top:4px"></div>
+  <div class="sg"><div class="st"><div class="sl">Total affiliates</div><div class="sv">6</div></div><div class="st"><div class="sl">Total members</div><div class="sv">318</div></div><div class="st"><div class="sl">Avg density</div><div class="sv">58%</div></div><div class="st"><div class="sl">Active campaigns</div><div class="sv">11</div></div></div>
+  <div class="card"><div class="sec" style="margin-top:0">Affiliate density snapshot</div><div id="a-snap"></div></div>
+  <div class="card"><div class="sec" style="margin-top:0">Messages sent this month</div><div style="display:flex;gap:6px;align-items:flex-end;height:64px;margin-bottom:6px" id="a-comms"></div><div style="display:flex;justify-content:space-around;font-size:10px;color:var(--t2)"><span>SMS</span><span>WhatsApp</span><span>Email</span><span>Total</span></div></div>
+</div>
+<div class="pg" id="ap-affiliates">
+  <div style="padding-top:4px"></div>
+  <div class="card" id="a-aff-list"></div>
+  <div id="a-aff-det" style="display:none"></div>
+</div>
+<div class="pg" id="ap-trends">
+  <div style="padding-top:4px"></div>
+  <div class="card"><div class="sec" style="margin-top:0">Membership density by affiliate</div><div id="a-density"></div></div>
+  <div class="card"><div class="sec" style="margin-top:0">Campaign win rate</div><div id="a-wins"></div></div>
+</div>
+<!-- SETTINGS -->
+<div class="pg" id="ap-settings">
+  <div style="padding-top:4px"></div>
+  <div style="font-size:13px;color:var(--t2);margin-bottom:12px;line-height:1.5">Manage all reference lists used across the app. Add, edit, or archive items — changes take effect immediately for all affiliates.</div>
+  <div id="settings-sections"></div>
+  <div class="card"><div class="sec" style="margin-top:0">Feature flags — all affiliates</div>
+    <div class="trow"><div><div style="font-size:13px;color:var(--t1)">Workplace map</div><div style="font-size:11px;color:var(--t2)">Site and shift-based worker mapping</div></div><label class="tgl"><input type="checkbox" checked><div class="tgl-t"></div><div class="tgl-th"></div></label></div>
+    <div class="trow"><div><div style="font-size:13px;color:var(--t1)">Campaign builder</div><div style="font-size:11px;color:var(--t2)">Petitions, action tracker, escalation</div></div><label class="tgl"><input type="checkbox" checked><div class="tgl-t"></div><div class="tgl-th"></div></label></div>
+    <div class="trow"><div><div style="font-size:13px;color:var(--t1)">Membership form builder</div><div style="font-size:11px;color:var(--t2)">Custom form with digital signature</div></div><label class="tgl"><input type="checkbox" checked><div class="tgl-t"></div><div class="tgl-th"></div></label></div>
+    <div class="trow"><div><div style="font-size:13px;color:var(--t1)">SMS / WhatsApp messaging</div><div style="font-size:11px;color:var(--t2)">Group message sending</div></div><label class="tgl"><input type="checkbox" checked><div class="tgl-t"></div><div class="tgl-th"></div></label></div>
+    <div class="trow"><div><div style="font-size:13px;color:var(--t1)">CSV / PDF export</div></div><label class="tgl"><input type="checkbox" checked><div class="tgl-t"></div><div class="tgl-th"></div></label></div>
+    <button class="btn btn-p" style="margin-top:10px" onclick="toastA('Feature flags saved')">Save flags</button>
+  </div>
+  <div class="card"><div class="sec" style="margin-top:0">Roles &amp; permissions — delegate role</div>
+    <div class="trow"><div style="font-size:13px;color:var(--t1)">View members &amp; profiles</div><label class="tgl"><input type="checkbox" checked><div class="tgl-t"></div><div class="tgl-th"></div></label></div>
+    <div class="trow"><div style="font-size:13px;color:var(--t1)">Update worker status on map</div><label class="tgl"><input type="checkbox" checked><div class="tgl-t"></div><div class="tgl-th"></div></label></div>
+    <div class="trow"><div style="font-size:13px;color:var(--t1)">Add new workers</div><label class="tgl"><input type="checkbox"><div class="tgl-t"></div><div class="tgl-th"></div></label></div>
+    <div class="trow"><div style="font-size:13px;color:var(--t1)">Create campaigns</div><label class="tgl"><input type="checkbox"><div class="tgl-t"></div><div class="tgl-th"></div></label></div>
+    <div class="trow"><div style="font-size:13px;color:var(--t1)">Send group messages</div><label class="tgl"><input type="checkbox"><div class="tgl-t"></div><div class="tgl-th"></div></label></div>
+    <button class="btn btn-p" style="margin-top:10px" onclick="toastA('Permissions saved')">Save permissions</button>
+  </div>
+  <div class="toast" id="t-a2"></div>
+</div>
+<div class="pg" id="ap-addaff">
+  <div style="padding-top:4px"></div>
+  <div class="card">
+    <div style="font-size:14px;font-weight:700;color:var(--t1);margin-bottom:12px">Register new PSI affiliate</div>
+    <label>Union name</label><input type="text" placeholder="e.g. Colombo Port Workers Union" style="margin-bottom:9px">
+    <label>Country</label><select id="reg-country" style="margin-bottom:9px"></select>
+    <label>Sector</label><select id="reg-sector" style="margin-bottom:9px"></select>
+    <label>Estimated workforce size</label><input type="number" placeholder="Total workers in workplace" style="margin-bottom:9px">
+    <label>Lead organiser name</label><input type="text" placeholder="Full name" style="margin-bottom:9px">
+    <label>Lead organiser email</label><input type="email" placeholder="organiser@union.org" style="margin-bottom:9px">
+    <button class="btn btn-p" onclick="toastA('Affiliate registered — login credentials sent to organiser')">Register affiliate</button>
+  </div>
+  <div class="toast" id="t-a"></div>
+</div>
+</div>
+
+</div>
+<script>
+const PSS={member:{label:'Member',bg:'#FDECEA',tc:'#7A0019'},delegate:{label:'Delegate',bg:'#E3F2FD',tc:'#0D47A1'},leader:{label:'Leader',bg:'#FFF3E0',tc:'#7B3A00'},active:{label:'Active',bg:'#E8F5E9',tc:'#1B5E20'},nonmember:{label:'Non-member',bg:'#F5F5F5',tc:'#424242'},formgiven:{label:'Form given',bg:'#F3E5F5',tc:'#4A148C'},mapped:{label:'Roster only',bg:'#E8EAF6',tc:'#1A237E'},unknown:{label:'Not mapped',bg:'#ECEFF1',tc:'#546E7A'}};
+const BM={member:'b-r',delegate:'b-b',leader:'b-o',active:'b-g',nonmember:'b-gy',formgiven:'b-p'};
+const ACTIONS_DEF=[{k:'ppe',l:'PPE petition'},{k:'wage',l:'Wage petition'},{k:'mtg',l:'Meeting'},{k:'leaf',l:'Leaflets'}];
+const UNIONS={dhaka:{name:"Dhaka Sanitation Workers Union",country:"Bangladesh",sector:"Sanitation",members:47,density:62,campaigns:2,delegates:6,leaders:8,flag:"🇧🇩",color:"#FDECEA",tc:"#7A0019"},manila:{name:"Manila Health Workers Union",country:"Philippines",sector:"Healthcare",members:83,density:69,campaigns:3,delegates:9,leaders:12,flag:"🇵🇭",color:"#FFF3E0",tc:"#7B3A00"},jakarta:{name:"Jakarta Garment Workers",country:"Indonesia",sector:"Garment",members:61,density:47,campaigns:2,flag:"🇮🇩",color:"#F5F5F5",tc:"#424242"},colombo:{name:"Colombo Port Workers",country:"Sri Lanka",sector:"Transport",members:55,density:69,campaigns:1,flag:"🇱🇰",color:"#E3F2FD",tc:"#0D47A1"},dhaka2:{name:"Dhaka Domestic Workers",country:"Bangladesh",sector:"Domestic workers",members:38,density:42,campaigns:2,flag:"🇧🇩",color:"#E8F5E9",tc:"#1B5E20"},ktm:{name:"Kathmandu Construction",country:"Nepal",sector:"Construction",members:34,density:49,campaigns:1,flag:"🇳🇵",color:"#F3E5F5",tc:"#4A148C"}};
+const MEMBERS_DATA={dhaka:[{id:1,name:"Fatema Rahman",dept:"Zone 3",role:"member",i:"FR",bg:"#FDECEA",tc:"#7A0019",phone:"+880 171 234 5678",job:"Collector Gr.2",years:4,employer_id:"DSW-041",actions:{ppe:true,wage:true,mtg:true,leaf:false},notes:"Key contact for crew A"},{id:2,name:"Mohammed Hossain",dept:"Zone 3",role:"leader",i:"MH",bg:"#FFF3E0",tc:"#7B3A00",phone:"+880 171 345 6789",job:"Senior collector",years:8,employer_id:"DSW-018",actions:{ppe:true,wage:true,mtg:true,leaf:true},notes:"High trust organic leader"},{id:3,name:"Karim Uddin",dept:"Zone 3",role:"delegate",i:"KU",bg:"#E3F2FD",tc:"#0D47A1",phone:"+880 171 456 7890",job:"Collector Gr.3",years:6,employer_id:"DSW-023",actions:{ppe:true,wage:true,mtg:true,leaf:true},notes:"Elected delegate Mar 2026"},{id:4,name:"Parveen Sultana",dept:"Zone 3",role:"leader",i:"PS",bg:"#FFF3E0",tc:"#7B3A00",phone:"+880 171 567 8901",job:"Collector Gr.2",years:5,employer_id:"DSW-031",actions:{ppe:true,wage:false,mtg:true,leaf:false},notes:""},{id:5,name:"Rafiq Ahmed",dept:"Zone 3",role:"member",i:"RA",bg:"#FDECEA",tc:"#7A0019",phone:"+880 171 678 9012",job:"Collector Gr.1",years:2,employer_id:"DSW-055",actions:{ppe:true,wage:true,mtg:false,leaf:false},notes:""},{id:6,name:"Sumi Akter",dept:"Sweeping",role:"active",i:"SU",bg:"#E8F5E9",tc:"#1B5E20",phone:"+880 171 789 0123",job:"Street sweeper",years:4,employer_id:"DSW-077",actions:{ppe:true,wage:true,mtg:true,leaf:false},notes:"Ready to join — supportive"},{id:7,name:"Shaheda Akter",dept:"Sweeping",role:"formgiven",i:"SA",bg:"#F3E5F5",tc:"#4A148C",phone:"+880 171 890 1234",job:"Street sweeper",years:1,employer_id:"DSW-071",actions:{ppe:false,wage:false,mtg:false,leaf:false},notes:"Form given 12 Apr — follow up needed"},{id:8,name:"Nuru Islam",dept:"Zone 2",role:"formgiven",i:"NI",bg:"#F3E5F5",tc:"#4A148C",phone:"+880 171 901 2345",job:"Collector Gr.1",years:2,employer_id:"DSW-044",actions:{ppe:false,wage:false,mtg:true,leaf:false},notes:"Attended meeting — interested in joining"}],manila:[{id:20,name:"Maria Aguilar",dept:"Ward B",role:"delegate",i:"MA",bg:"#E3F2FD",tc:"#0D47A1",phone:"+63 917 234 5678",job:"Senior nurse",years:7,employer_id:"MHW-001",actions:{ppe:true,wage:true,mtg:true,leaf:true},notes:"Lead delegate Ward B"},{id:21,name:"Jose Santos",dept:"Ward A",role:"member",i:"JS",bg:"#FDECEA",tc:"#7A0019",phone:"+63 917 345 6789",job:"Nurse Gr.2",years:4,employer_id:"MHW-012",actions:{ppe:true,wage:true,mtg:false,leaf:false},notes:""},{id:22,name:"Liza Reyes",dept:"Ward C",role:"leader",i:"LR",bg:"#FFF3E0",tc:"#7B3A00",phone:"+63 917 456 7890",job:"Charge nurse",years:9,employer_id:"MHW-008",actions:{ppe:true,wage:true,mtg:true,leaf:true},notes:"Key organic leader"},{id:23,name:"Ramon Cruz",dept:"Ward B",role:"nonmember",i:"RC",bg:"#F5F5F5",tc:"#424242",phone:"+63 917 567 8901",job:"Orderly",years:2,employer_id:"MHW-034",actions:{ppe:false,wage:false,mtg:false,leaf:false},notes:"Not yet contacted"}]};
+const CAMPS=[{id:1,title:"PPE & safety equipment",type:"pet",typeLabel:"Petition",typeCls:"ct-pet",sigs:38,target:50,status:"active"},{id:2,title:"18% wage increase",type:"lob",typeLabel:"Negotiation",typeCls:"ct-lob",sigs:29,target:50,status:"active"},{id:3,title:"Rest breaks — 2× daily",type:"pet",typeLabel:"Petition",typeCls:"ct-pet",sigs:50,target:50,status:"won"}];
+const SITES=[{id:'depot3',name:'Zone 3 — Waste Depot',location:'Mirpur, Dhaka',shifts:[{id:'morning',label:'Morning',time:'5am–1pm'},{id:'afternoon',label:'Afternoon',time:'1pm–9pm'},{id:'night',label:'Night',time:'9pm–5am'}],workers:{morning:[{id:1,name:'Fatema Rahman',initials:'FR',status:'member',zone:'Crew A',phone:'+880 171 234 5678',job:'Collector Gr.2',years:4,actions:{ppe:true,wage:true,mtg:true,leaf:false},notes:'Key contact crew A'},{id:2,name:'Mohammed Hossain',initials:'MH',status:'leader',zone:'Crew A',phone:'+880 171 345 6789',job:'Senior collector',years:8,actions:{ppe:true,wage:true,mtg:true,leaf:true},notes:'High trust organic leader'},{id:3,name:'Karim Uddin',initials:'KU',status:'delegate',zone:'Crew B',phone:'+880 171 456 7890',job:'Collector Gr.3',years:6,actions:{ppe:true,wage:true,mtg:true,leaf:true},notes:'Elected delegate Mar 2026'},{id:4,name:'Parveen Sultana',initials:'PS',status:'leader',zone:'Crew B',phone:'+880 171 567 8901',job:'Collector Gr.2',years:5,actions:{ppe:true,wage:false,mtg:true,leaf:false},notes:''},{id:5,name:'Rafiq Ahmed',initials:'RA',status:'member',zone:'Crew A',phone:'+880 171 678 9012',job:'Collector Gr.1',years:2,actions:{ppe:true,wage:true,mtg:false,leaf:false},notes:''},{id:6,name:'Sumi Akter',initials:'SU',status:'active',zone:'Sweeping',phone:'+880 171 789 0123',job:'Street sweeper',years:4,actions:{ppe:true,wage:true,mtg:true,leaf:false},notes:'Ready to join'},{id:7,name:'Shaheda Akter',initials:'SA',status:'formgiven',zone:'Sweeping',phone:'+880 171 890 1234',job:'Street sweeper',years:1,actions:{ppe:false,wage:false,mtg:false,leaf:false},notes:'Form given 12 Apr — follow up'},{id:8,name:'Nuru Islam',initials:'NI',status:'formgiven',zone:'Crew B',phone:'+880 171 901 2345',job:'Collector Gr.1',years:2,actions:{ppe:false,wage:false,mtg:true,leaf:false},notes:'Attended meeting — interested'},{id:9,name:'Delwar Mia',initials:'DM',status:'nonmember',zone:'Sweeping',phone:'+880 171 012 3456',job:'Street sweeper',years:3,actions:{ppe:false,wage:false,mtg:false,leaf:false},notes:"Hostile — supervisor's cousin"},{id:10,name:'Tofail Islam',initials:'TI',status:'nonmember',zone:'Crew A',phone:'+880 171 123 4567',job:'Collector Gr.1',years:1,actions:{ppe:false,wage:false,mtg:false,leaf:false},notes:'New hire — not yet approached'},{id:11,name:'Mintu Mia',initials:'MM',status:'member',zone:'Crew B',phone:'+880 171 234 5670',job:'Collector Gr.2',years:5,actions:{ppe:true,wage:true,mtg:false,leaf:false},notes:''},{id:12,name:'Rowshan Ara',initials:'RW',status:'member',zone:'Sweeping',phone:'+880 171 345 6781',job:'Street sweeper',years:3,actions:{ppe:false,wage:true,mtg:true,leaf:false},notes:''}],afternoon:[{id:13,name:'Bilkis Khanam',initials:'BK',status:'delegate',zone:'Crew C',phone:'+880 171 456 7802',job:'Collector Gr.3',years:7,actions:{ppe:true,wage:true,mtg:true,leaf:true},notes:'Afternoon lead delegate'},{id:14,name:'Anwar Hussain',initials:'AH',status:'active',zone:'Crew C',phone:'+880 171 567 8903',job:'Senior collector',years:6,actions:{ppe:true,wage:true,mtg:true,leaf:true},notes:''},{id:15,name:'Nasrin Akter',initials:'NA',status:'nonmember',zone:'Sweeping',phone:'+880 171 678 9014',job:'Street sweeper',years:2,actions:{ppe:false,wage:false,mtg:false,leaf:false},notes:'Not yet contacted'},{id:16,name:'Salma Begum',initials:'SB',status:'member',zone:'Crew C',phone:'+880 171 789 0125',job:'Collector Gr.2',years:4,actions:{ppe:true,wage:true,mtg:true,leaf:false},notes:''},{id:17,name:'Jahangir H.',initials:'JH',status:'formgiven',zone:'Sweeping',phone:'+880 171 890 1236',job:'Street sweeper',years:1,actions:{ppe:false,wage:false,mtg:true,leaf:false},notes:''},{id:18,name:'Kamrul Hassan',initials:'KH',status:'mapped',zone:'Crew D',phone:'Unknown',job:'Collector Gr.1',years:0,actions:{ppe:false,wage:false,mtg:false,leaf:false},notes:'Roster only — not yet spoken to'}],night:[{id:19,name:'Rina Begum',initials:'RN',status:'member',zone:'Night A',phone:'+880 171 012 3457',job:'Night collector',years:6,actions:{ppe:true,wage:true,mtg:true,leaf:true},notes:''},{id:20,name:'Habib Rahman',initials:'HR',status:'nonmember',zone:'Night A',phone:'+880 171 123 4568',job:'Night collector',years:2,actions:{ppe:false,wage:false,mtg:false,leaf:false},notes:'Hard to reach'},{id:21,name:'Moriam Khatun',initials:'MK',status:'active',zone:'Night B',phone:'+880 171 234 5679',job:'Night collector',years:3,actions:{ppe:true,wage:false,mtg:false,leaf:false},notes:''},{id:22,name:'Unknown worker',initials:'??',status:'unknown',zone:'Night B',phone:'',job:'',years:0,actions:{ppe:false,wage:false,mtg:false,leaf:false},notes:'Roster slot — identity unknown'}]}},{id:'depot4',name:'Zone 4 — Transfer Station',location:'Rayer Bazar, Dhaka',shifts:[{id:'day',label:'Day',time:'6am–2pm'},{id:'late',label:'Late',time:'2pm–10pm'}],workers:{day:[{id:23,name:'Ahmed Kabir',initials:'AK',status:'member',zone:'Loading bay',phone:'+880 171 345 6782',job:'Transfer operator',years:5,actions:{ppe:true,wage:true,mtg:true,leaf:false},notes:''},{id:24,name:'Sumaiya Begum',initials:'SBG',status:'delegate',zone:'Loading bay',phone:'+880 171 456 7803',job:'Senior operator',years:9,actions:{ppe:true,wage:true,mtg:true,leaf:true},notes:'Zone 4 delegate'},{id:25,name:'Razib Hossain',initials:'RH',status:'nonmember',zone:'Sorting floor',phone:'+880 171 567 8904',job:'Sorter',years:2,actions:{ppe:false,wage:false,mtg:false,leaf:false},notes:''},{id:26,name:'Taslima Akter',initials:'TA',status:'formgiven',zone:'Sorting floor',phone:'+880 171 678 9015',job:'Sorter',years:1,actions:{ppe:false,wage:false,mtg:true,leaf:false},notes:'Form given 15 Apr — interested'},{id:27,name:'Masum Islam',initials:'MI',status:'member',zone:'Loading bay',phone:'+880 171 789 0126',job:'Transfer operator',years:4,actions:{ppe:true,wage:false,mtg:true,leaf:false},notes:''}],late:[{id:28,name:'Jasmine Khatun',initials:'JK',status:'active',zone:'Loading bay',phone:'+880 171 890 1237',job:'Transfer operator',years:3,actions:{ppe:true,wage:true,mtg:false,leaf:false},notes:'Supportive — ready to join'},{id:29,name:'Rubel Ahmed',initials:'RA2',status:'nonmember',zone:'Loading bay',phone:'+880 171 901 2348',job:'Transfer operator',years:2,actions:{ppe:false,wage:false,mtg:false,leaf:false},notes:''},{id:30,name:'Nazma Begum',initials:'NB',status:'member',zone:'Admin',phone:'+880 171 012 3459',job:'Admin clerk',years:7,actions:{ppe:true,wage:true,mtg:true,leaf:true},notes:''}]}}];
+const REF={countries:{label:'Countries',items:[{id:1,label:'Bangladesh',active:true},{id:2,label:'Philippines',active:true},{id:3,label:'India',active:true},{id:4,label:'Indonesia',active:true},{id:5,label:'Sri Lanka',active:true},{id:6,label:'Nepal',active:true},{id:7,label:'Myanmar',active:true},{id:8,label:'Cambodia',active:true},{id:9,label:'Pakistan',active:true},{id:10,label:'Vietnam',active:true}]},sectors:{label:'Sectors',items:[{id:1,label:'Sanitation',active:true},{id:2,label:'Healthcare',active:true},{id:3,label:'Transport',active:true},{id:4,label:'Domestic workers',active:true},{id:5,label:'Construction',active:true},{id:6,label:'Garment',active:true},{id:7,label:'Agriculture',active:true},{id:8,label:'Education',active:true},{id:9,label:'Port workers',active:true}]},camptypes:{label:'Campaign types',items:[{id:1,label:'Petition',active:true},{id:2,label:'Negotiation',active:true},{id:3,label:'Day of action',active:true},{id:4,label:'Media campaign',active:true},{id:5,label:'Work stoppage',active:true}]},campactions:{label:'Campaign action types',items:[{id:1,label:'Signed petition',active:true},{id:2,label:'Attended meeting',active:true},{id:3,label:'Distributed leaflets',active:true},{id:4,label:'Rally attendance',active:true},{id:5,label:'Completed membership form',active:true},{id:6,label:'Spoke to co-worker',active:true}]},statuses:{label:'Worker status types',items:[{id:1,label:'Union member',active:true},{id:2,label:'Delegate',active:true},{id:3,label:'Organic leader',active:true},{id:4,label:'Active (non-member)',active:true},{id:5,label:'Non-member',active:true},{id:6,label:'Form given',active:true},{id:7,label:'Roster only',active:true},{id:8,label:'Not yet mapped',active:true}]},employment:{label:'Employment types',items:[{id:1,label:'Full-time',active:true},{id:2,label:'Part-time',active:true},{id:3,label:'Casual',active:true},{id:4,label:'Contractual',active:true}]}};
+let nextRefId=200,CU=null,CUK='dhaka',mFilt='all',ctVal='pet',curSite=null,curShift=null,curWorker=null,mapFilt='all',profileFrom='dash',profileWorkerId=null;
+const USERS={org1:{role:'organiser',uk:'dhaka',name:'Rina Begum'},org2:{role:'organiser',uk:'manila',name:'Maria Aguilar'},del:{role:'delegate',uk:'dhaka',name:'Karim Uddin'},admin:{role:'admin',name:'PSI Admin'}};
+
+function $(id){return document.getElementById(id)}
+function show(id){$(id).style.display='block'}
+function hide(id){$(id).style.display='none'}
+
+// ── NAVIGATION & UTILITIES ───────────────────────────────────────
+
+function uPg(id,btn){
+  document.querySelectorAll('#sc-union .pg').forEach(p=>p.classList.remove('active'));
+  $('up-'+id).classList.add('active');
+  document.querySelectorAll('#u-nav button').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+}
+function aPg(id,btn){
+  document.querySelectorAll('#sc-admin .pg').forEach(p=>p.classList.remove('active'));
+  $('ap-'+id).classList.add('active');
+  document.querySelectorAll('.nav-a button').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+}
+function fPg(id,btn){
+  ['builder','preview','send','subs'].forEach(s=>hide('fp-'+s));
+  show('fp-'+id);
+  ['fb0','fb1','fb2','fb3'].forEach(b=>{const e=$(b);if(e)e.classList.remove('active')});
+  const m={builder:'fb0',preview:'fb1',send:'fb2',subs:'fb3'};
+  $(m[id]).classList.add('active');
+}
+function toast(m){
+  const ids=['t-u','t-map','t-cd','t-camp','t-mwv','t-prof','t-ev','t-uset'];
+  const vis=ids.map(i=>$(i)).filter(t=>t&&t.offsetParent!==null);
+  const t=vis[0]||$(ids[0]);
+  if(t){t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2500);}
+}
+function toastA(m){
+  ['t-a','t-a2'].forEach(id=>{const t=$(id);if(t){t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',2500);}});
+}
+function logout(){
+  CU=null;
+  document.querySelectorAll('.screen').forEach(s=>{s.style.display='none';s.classList.remove('active')});
+  $('sc-login').style.display='block';$('sc-login').classList.add('active');
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+  $('up-dash').classList.add('active');$('ap-overview').classList.add('active');
+  document.querySelectorAll('#u-nav button').forEach((b,i)=>{b.classList.remove('active');if(i===0)b.classList.add('active')});
+  document.querySelectorAll('.nav-a button').forEach((b,i)=>{b.classList.remove('active');if(i===0)b.classList.add('active')});
+}
+
+// ── NEW V3 FUNCTIONS ──────────────────────────────────────────────
+
+// Profile tabs (Details / Training)
+function showProfileTab(tab){
+  ['details','training'].forEach(t=>{
+    const el=$('profile-tab-'+t);if(el)el.style.display=t===tab?'block':'none';
+    const btn=$('ptab-'+t);
+    if(btn){btn.style.background=t===tab?'var(--psi)':'var(--bg2)';btn.style.color=t===tab?'#fff':'var(--t2)';}
+  });
+  if(tab==='training')renderTrainingList();
+}
+
+// Training records
+let workerTraining={};
+function renderTrainingList(){
+  const w=getAllWorkers().find(x=>x.id===profileWorkerId);
+  const isDel=['delegate','leader'].includes(w?.role||w?.status);
+  const recs=workerTraining[profileWorkerId]||[];
+  if(!isDel){$('training-list').innerHTML='<div style="font-size:12px;color:var(--t2);padding:8px 0;line-height:1.5">Training tracking is available for delegates and organic leaders.</div>';return;}
+  if(!recs.length){$('training-list').innerHTML='<div style="font-size:12px;color:var(--t2);padding:8px 0">No training records yet. Tap below to add one.</div>';return;}
+  const now=new Date();
+  $('training-list').innerHTML=recs.map(r=>{
+    const isOld=r.status==='Completed'&&r.date&&(now-new Date(r.date))>1000*60*60*24*730;
+    return `<div style="display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:1px solid var(--bord)"><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--t1)">${r.course}</div><div style="font-size:11px;color:var(--t2);margin-top:2px">${r.date||'Date not recorded'}</div>${isOld?'<div style="font-size:10px;color:#7B3A00;background:#FFF3E0;border-radius:4px;padding:1px 6px;display:inline-block;margin-top:3px">Refresher due</div>':''}</div><span class="badge ${r.status==='Completed'?'b-g':r.status==='In progress'?'b-b':'b-o'}">${r.status}</span></div>`;
+  }).join('');
+}
+function showAddTraining(){show('add-training-form');}
+function hideAddTraining(){hide('add-training-form');}
+function saveTraining(){
+  const course=$('training-course').value,date=$('training-date').value,status=$('training-status').value;
+  if(!workerTraining[profileWorkerId])workerTraining[profileWorkerId]=[];
+  workerTraining[profileWorkerId].push({course,date,status});
+  hide('add-training-form');renderTrainingList();
+  const t=$('t-prof');t.textContent='Training record saved';t.style.display='block';setTimeout(()=>t.style.display='none',2400);
+}
+
+// Campaign tools toggle + dynamic next button
+let selTools={petition:true,tracker:false,sms:false,leaflet:false,pledge:false,escalation:false};
+function toggleTool(el,key){
+  el.classList.toggle('on');selTools[key]=el.classList.contains('on');updateCb2Next();
+}
+function updateCb2Next(){
+  const b=$('cb2-next');if(!b)return;
+  if(selTools.petition)b.textContent='Next: Petition setup \u2192';
+  else if(selTools.sms)b.textContent='Next: SMS setup \u2192';
+  else b.textContent='Next: Review & launch \u2192';
+}
+
+// Campaign detail views
+function showPetitionView(){['cv-list','cv-builder','cv-detail','cv-escalation'].forEach(id=>{const e=$(id);if(e)hide(id);});show('cv-petition');}
+function hidePetitionView(){hide('cv-petition');show('cv-detail');}
+function showEscalationView(){['cv-list','cv-builder','cv-detail','cv-petition'].forEach(id=>{const e=$(id);if(e)hide(id);});show('cv-escalation');}
+function hideEscalationView(){hide('cv-escalation');show('cv-detail');}
+function goToCommsWithCampaign(){
+  uPg('comms',document.querySelectorAll('#u-nav button')[4]);
+  const banner=$('comms-campaign-banner');
+  if(banner){banner.textContent='Campaign context: PPE & safety equipment — pre-filled for SMS blast';banner.style.display='block';}
+  setTimeout(()=>toast('Campaign context loaded in Messages'),200);
+}
+function goToMapForCampaign(){
+  uPg('map',document.querySelectorAll('#u-nav button')[2]);
+  setTimeout(()=>toast('Tip: filter by "Not joined" to see workers not yet reached by this campaign'),300);
+}
+
+// Events
+function showEvForm(){hide('ev-list-view');show('ev-form-view');}
+function hideEvForm(){show('ev-list-view');hide('ev-form-view');}
+function saveEvent(){
+  const title=$('ev-title').value||'New event';
+  const date=$('ev-date').value,time=$('ev-time').value,loc=$('ev-loc').value;
+  const sms=$('ev-sms').checked,cal=$('ev-cal').checked;
+  let msg='"'+title+'" scheduled';
+  if(sms&&cal)msg+=' — SMS sent + .ics calendar invite generated';
+  else if(sms)msg+=' — SMS sent to invitees';
+  else if(cal)msg+=' — .ics calendar invite generated';
+  const t=$('t-ev');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',3200);
+  buildEvents(title,date,time,loc);
+  setTimeout(hideEvForm,3300);
+}
+
+// Map export confirmation
+function showExportConfirm(){show('export-confirm');}
+function hideExportConfirm(){hide('export-confirm');}
+function doExport(){
+  hideExportConfirm();
+  toast('Generating confidential PDF — ready to print');
+}
+
+// Union settings — campaign types + training catalogue
+let unionCampTypes=['Petition','Day of action','Negotiation','Media','Work stoppage'];
+let unionTrainingTypes=['Organising fundamentals','OSH — occupational safety & health','Collective bargaining','Grievance handling',"Women's leadership"];
+function buildUnionSettings(){renderUnionCampTypes();renderUnionTrainingTypes();}
+function renderUnionCampTypes(){
+  const el=$('union-camp-types');if(!el)return;
+  el.innerHTML=unionCampTypes.map((t,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bord)"><span style="flex:1;font-size:13px;color:var(--t1)">${t}</span>${i<5?'<span class="badge b-gy" style="font-size:9px">PSI default</span>':`<button class="btn-sm-r" onclick="removeUnionCT(${i})">Remove</button>`}</div>`).join('');
+}
+function renderUnionTrainingTypes(){
+  const el=$('union-training-types');if(!el)return;
+  el.innerHTML=unionTrainingTypes.map((t,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bord)"><span style="flex:1;font-size:13px;color:var(--t1)">${t}</span>${i<5?'<span class="badge b-gy" style="font-size:9px">PSI default</span>':`<button class="btn-sm-r" onclick="removeUnionTR(${i})">Remove</button>`}</div>`).join('');
+}
+function addUnionCampType(){
+  const inp=$('new-ct-input'),val=inp.value.trim();if(!val)return;
+  unionCampTypes.push(val);inp.value='';renderUnionCampTypes();
+  const chips=$('ct-chips');if(chips){const c=document.createElement('div');c.className='chip';c.textContent=val;c.onclick=function(){selCT(this,val);};chips.appendChild(c);}
+  const t=$('t-uset');t.textContent='"'+val+'" added';t.style.display='block';setTimeout(()=>t.style.display='none',2400);
+}
+function addUnionTraining(){
+  const inp=$('new-tr-input'),val=inp.value.trim();if(!val)return;
+  unionTrainingTypes.push(val);inp.value='';renderUnionTrainingTypes();
+  const sel=$('training-course');if(sel){const opt=document.createElement('option');opt.textContent=val;sel.insertBefore(opt,sel.lastElementChild);}
+  const t=$('t-uset');t.textContent='"'+val+'" added';t.style.display='block';setTimeout(()=>t.style.display='none',2400);
+}
+function removeUnionCT(i){unionCampTypes.splice(i,1);renderUnionCampTypes();}
+function removeUnionTR(i){unionTrainingTypes.splice(i,1);renderUnionTrainingTypes();}
+
+// ── UPDATED CORE FUNCTIONS (v3) ───────────────────────────────────
+
+function getAllWorkers(){
+  const all=[...(MEMBERS_DATA[CUK]||MEMBERS_DATA.dhaka)];
+  SITES.forEach(s=>Object.values(s.workers).flat().forEach(w=>{if(!all.find(x=>x.id===w.id))all.push({...w,dept:w.zone});}));
+  return all;
+}
+
+function openProfile(id,from){
+  const w=getAllWorkers().find(x=>x.id===id);if(!w)return;
+  profileFrom=from;profileWorkerId=id;
+  const st=PSS[w.role||w.status]||PSS.nonmember;
+  const ini=w.i||w.initials||'?';
+  const ac=w.actions?Object.values(w.actions).filter(Boolean).length:0;
+  const isDel=['delegate','leader'].includes(w.role||w.status);
+  $('profile-content').innerHTML=`<div class="profile-panel"><div class="profile-header"><div class="profile-av" style="background:${st.bg||w.bg||'#F5F5F5'};color:${st.tc||w.tc||'#424242'}">${ini}</div><div><div class="profile-name">${w.name}</div><div class="profile-role">${st.label}${(w.job||w.dept)?' · '+(w.job||w.dept):''}</div></div></div>${[['Zone / section',w.zone||w.dept||'—'],['Phone',w.phone||'Not recorded'],['Employer ID',w.employer_id||'Not recorded'],['Job title',w.job||'Not recorded'],['Years employed',w.years>0?w.years+' yrs':'Not recorded'],['Actions taken',ac+' of '+ACTIONS_DEF.length]].map(([k,v])=>`<div class="drow"><span class="dk">${k}</span><span class="dv">${v}</span></div>`).join('')}${w.notes?`<div style="background:#FDECEA;border-radius:var(--r);padding:8px 9px;margin-top:9px;font-size:11px;color:#7A0019;line-height:1.5">${w.notes}</div>`:''}</div><div class="card"><div class="sec" style="margin-top:0">Campaign actions <span style="font-size:10px;font-weight:400;color:var(--t3)">tap to toggle</span></div>${ACTIONS_DEF.map(a=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--bord);font-size:12px;cursor:pointer" onclick="toggleAction(${id},'${a.k}',this)"><span style="color:var(--t1)">${a.l}</span><span id="act-${id}-${a.k}" style="display:flex;align-items:center;gap:7px;font-weight:600;color:${w.actions&&w.actions[a.k]?'#1B5E20':'#bdbdbd'}"><span style="width:24px;height:24px;border-radius:50%;background:${w.actions&&w.actions[a.k]?'#43A047':'#eee'};display:inline-flex;align-items:center;justify-content:center;border:1px solid ${w.actions&&w.actions[a.k]?'#43A047':'#ccc'};font-size:12px;color:#fff;flex-shrink:0">${w.actions&&w.actions[a.k]?'✓':''}</span>${w.actions&&w.actions[a.k]?'Done':'Not yet'}</span></div>`).join('')}</div><div style="display:flex;gap:7px;margin-bottom:10px"><button class="btn btn-p" style="flex:1;font-size:12px" onclick="toast('Edit profile — coming in full version')">Edit profile</button><button class="btn btn-s" style="flex:1;font-size:12px" onclick="toast('SMS sent to worker')">Send SMS</button></div>`;
+  // Show training tab only for delegates/leaders
+  const tTab=$('ptab-training');if(tTab)tTab.style.display=isDel?'block':'none';
+  showProfileTab('details');
+  $('prof-status').innerHTML=Object.entries(PSS).map(([k,v])=>`<option value="${k}"${k===(w.role||w.status)?' selected':''}>${v.label}</option>`).join('');
+  $('prof-note').value=w.notes||'';
+  const bkl={dash:'← Dashboard',members:'← Members',camp:'← Campaign',forms:'← Submissions',map:'← Map'};
+  const backBtn=$('profile-back');
+  backBtn.textContent=bkl[from]||'← Back';
+  backBtn.onclick=()=>{
+    const pgMap={camp:'campaigns',forms:'forms',map:'map',members:'members',dash:'dash'};
+    const navIdx={dash:0,members:1,map:2,campaigns:3,comms:4,events:5,add:6,forms:7,usettings:8};
+    const dest=pgMap[from]||from;
+    uPg(dest,document.querySelectorAll('#u-nav button')[navIdx[dest]]);
+  };
+  uPg('profile',null);
+}
+
+function buildDash(){
+  const u=UNIONS[CUK];
+  $('ds-stats').innerHTML=`<div class="st"><div class="sl">Members</div><div class="sv sv-r">${u.members}</div></div><div class="st"><div class="sl">Density</div><div class="sv">${u.density}%</div></div><div class="st"><div class="sl">Active campaigns</div><div class="sv sv-r">${u.campaigns}</div></div><div class="st"><div class="sl">Sites mapped</div><div class="sv">${SITES.length}</div></div>`;
+  $('ds-camps').innerHTML=`<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:3px;color:var(--t1)"><span>PPE &amp; safety equipment</span><span style="color:var(--psi)">38 signed</span></div><div class="pb"><div class="pf" style="width:76%"></div></div><div class="pl">76% of 50 target</div></div><div><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:3px;color:var(--t1)"><span>18% wage increase</span><span style="color:var(--psi)">29 signed</span></div><div class="pb"><div class="pf" style="width:58%"></div></div><div class="pl">58% of 50 target</div></div>`;
+}
+
+function buildMembers(){window._mem=MEMBERS_DATA[CUK]||MEMBERS_DATA.dhaka;renderMem(window._mem);}
+function renderMem(list){$('m-list').innerHTML=list.length?list.map(m=>`<div class="mr" onclick="openProfile(${m.id},'members')"><div class="av" style="background:${m.bg};color:${m.tc}">${m.i}</div><div class="mi"><div class="mn mn-link">${m.name}</div><div class="md">${m.dept}${m.job?' · '+m.job:''}</div></div><span class="badge ${BM[m.role]||'b-gy'}">${PSS[m.role]?.label||m.role}</span><span style="color:var(--t3);font-size:14px;margin-left:3px">›</span></div>`).join(''):'<div style="font-size:12px;color:var(--t2);padding:6px 0">No matches</div>';}
+function filterM(){const q=$('ms').value.toLowerCase();let l=window._mem||[];if(mFilt!=='all')l=l.filter(m=>m.role===mFilt);if(q)l=l.filter(m=>m.name.toLowerCase().includes(q));renderMem(l);}
+function mChip(el,f){document.querySelectorAll('#m-chips .chip').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');mFilt=f;filterM();}
+
+function buildSiteList(){
+  $('map-site-list').innerHTML=SITES.map(s=>{
+    const all=Object.values(s.workers).flat();const cnt={};all.forEach(w=>cnt[w.status]=(cnt[w.status]||0)+1);
+    const total=all.length,inU=(cnt.member||0)+(cnt.delegate||0)+(cnt.leader||0),pct=total?Math.round(inU/total*100):0;
+    const segs=[{k:'delegate',c:'#1976D2'},{k:'leader',c:'#F57C00'},{k:'member',c:'#C8102E'},{k:'active',c:'#43A047'},{k:'formgiven',c:'#9C27B0'},{k:'nonmember',c:'#BDBDBD'},{k:'mapped',c:'#7986CB'},{k:'unknown',c:'#ECEFF1'}];
+    return `<div class="site-card" onclick="openSite('${s.id}')"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px"><div style="font-size:14px;font-weight:700;color:var(--t1)">${s.name}</div><span style="font-size:14px;font-weight:700;color:var(--psi);flex-shrink:0;margin-left:8px">${pct}%</span></div><div style="font-size:11px;color:var(--t2);margin-bottom:8px">${s.location} · ${s.shifts.length} shift${s.shifts.length>1?'s':''} · ${total} workers</div><div style="display:flex;gap:2px;height:7px;border-radius:4px;overflow:hidden;margin-bottom:5px">${segs.map(sg=>cnt[sg.k]?`<div style="flex:${cnt[sg.k]};background:${sg.c}"></div>`:'').join('')}</div><div style="display:flex;flex-wrap:wrap;gap:5px">${segs.filter(sg=>cnt[sg.k]).map(sg=>`<div style="display:flex;align-items:center;gap:3px;font-size:10px;color:var(--t2)"><div style="width:7px;height:7px;border-radius:2px;background:${sg.c}"></div>${cnt[sg.k]} ${PSS[sg.k]?.label||sg.k}</div>`).join('')}</div></div>`;
+  }).join('')+`<button class="btn btn-s" style="font-size:12px" onclick="toast('Add site — coming in full version')">+ Add new site</button>`;
+}
+function openSite(id){curSite=SITES.find(s=>s.id===id);curShift=curSite.shifts[0].id;mapFilt='all';$('map-site-name').textContent=curSite.name;hide('map-site-list');show('map-site-view');hide('export-confirm');renderShiftTabs();renderMapTable();}
+function closeSite(){hide('map-site-view');hide('map-worker-view');show('map-site-list');curSite=null;curShift=null;curWorker=null;}
+function renderShiftTabs(){$('shift-tabs').innerHTML=curSite.shifts.map(sh=>`<div class="stab${sh.id===curShift?' active':''}" onclick="switchShift('${sh.id}',this)">${sh.label} <span style="font-size:9px;opacity:.7">${sh.time}</span></div>`).join('');}
+function switchShift(id,el){curShift=id;document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderMapTable();}
+function setMF(el,f){document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));el.classList.add('on');mapFilt=f;renderMapTable();}
+function renderMapTable(){
+  const workers=curSite.workers[curShift]||[];const filt=mapFilt==='all'?workers:workers.filter(w=>w.status===mapFilt);
+  const cnt={};workers.forEach(w=>cnt[w.status]=(cnt[w.status]||0)+1);
+  const inU=(cnt.member||0)+(cnt.delegate||0)+(cnt.leader||0),total=workers.length;
+  $('map-stats').innerHTML=`<div class="ms"><div class="msv" style="color:var(--psi)">${inU}</div><div class="msl">In union</div></div><div class="ms"><div class="msv">${total?Math.round(inU/total*100):0}%</div><div class="msl">Density</div></div><div class="ms"><div class="msv" style="color:#1B5E20">${(cnt.active||0)+(cnt.formgiven||0)}</div><div class="msl">Engaged</div></div><div class="ms"><div class="msv" style="color:#757575">${(cnt.nonmember||0)+(cnt.mapped||0)+(cnt.unknown||0)}</div><div class="msl">Not reached</div></div>`;
+  if(!filt.length){$('map-table-wrap').innerHTML=`<div style="padding:16px;text-align:center;font-size:13px;color:var(--t2)">No workers match this filter</div>`;return;}
+  let html=`<table class="map-table"><thead><tr><th style="min-width:130px">Worker</th><th style="min-width:65px">Zone</th><th style="min-width:70px">Status</th>${ACTIONS_DEF.map(a=>`<th class="ac" title="${a.l}">${a.l.split(' ').map(w=>w[0]).join('')}</th>`).join('')}</tr></thead><tbody>`;
+  filt.forEach(w=>{const st=PSS[w.status]||PSS.nonmember;html+=`<tr onclick="openWorkerFromMap(${w.id})"><td><div class="w-name-cell"><div class="w-av" style="background:${st.bg};color:${st.tc}">${w.initials}</div><span class="w-name">${w.name}</span></div></td><td style="font-size:11px;color:var(--t2)">${w.zone||'—'}</td><td><span class="sp" style="background:${st.bg};color:${st.tc}">${st.label.split(' ')[0]}</span></td>${ACTIONS_DEF.map(a=>`<td class="ac"><div class="ad ${w.actions[a.k]?'ad-y':'ad-n'}">${w.actions[a.k]?'<span class="ad-t">✓</span>':''}</div></td>`).join('')}</tr>`;});
+  $('map-table-wrap').innerHTML=html+'</tbody></table>';
+}
+function openWorkerFromMap(id){
+  const all=Object.values(curSite.workers).flat();curWorker=all.find(w=>w.id===id);if(!curWorker)return;
+  const st=PSS[curWorker.status]||PSS.nonmember;const ac=Object.values(curWorker.actions).filter(Boolean).length;
+  $('mwv-title').textContent=curWorker.name;
+  $('mwv-content').innerHTML=`<div class="profile-panel"><div class="profile-header"><div class="profile-av" style="background:${st.bg};color:${st.tc}">${curWorker.initials}</div><div><div class="profile-name">${curWorker.name}</div><div class="profile-role">${st.label}${curWorker.job?' · '+curWorker.job:''}</div></div></div>${[['Zone',curWorker.zone||'—'],['Phone',curWorker.phone||'Not recorded'],['Job title',curWorker.job||'Not recorded'],['Years employed',curWorker.years>0?curWorker.years+' yrs':'Not recorded'],['Actions taken',ac+' of '+ACTIONS_DEF.length]].map(([k,v])=>`<div class="drow"><span class="dk">${k}</span><span class="dv">${v}</span></div>`).join('')}${curWorker.notes?`<div style="background:#FDECEA;border-radius:var(--r);padding:8px 9px;margin-top:9px;font-size:11px;color:#7A0019;line-height:1.5">${curWorker.notes}</div>`:''}</div><div class="card"><div class="sec" style="margin-top:0">Campaign actions <span style="font-size:10px;font-weight:400;color:var(--t3)">tap to toggle</span></div>${ACTIONS_DEF.map(a=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--bord);font-size:12px;cursor:pointer" onclick="toggleActionMap(${curWorker.id},'${a.k}',this)"><span style="color:var(--t1)">${a.l}</span><span id="mact-${curWorker.id}-${a.k}" style="display:flex;align-items:center;gap:7px;font-weight:600;color:${curWorker.actions[a.k]?'#1B5E20':'#bdbdbd'}"><span style="width:24px;height:24px;border-radius:50%;background:${curWorker.actions[a.k]?'#43A047':'#eee'};display:inline-flex;align-items:center;justify-content:center;border:1px solid ${curWorker.actions[a.k]?'#43A047':'#ccc'};font-size:12px;color:#fff;flex-shrink:0">${curWorker.actions[a.k]?'✓':''}</span>${curWorker.actions[a.k]?'Done':'Not yet'}</span></div>`).join('')}</div><div style="display:flex;gap:7px;margin-bottom:10px"><button class="btn btn-p" style="flex:1;font-size:12px" onclick="toast('Edit profile — coming in full version')">Edit profile</button><button class="btn btn-s" style="flex:1;font-size:12px" onclick="toast('SMS sent')">Send SMS</button></div>`;
+  $('mwv-status').innerHTML=Object.entries(PSS).map(([k,v])=>`<option value="${k}"${k===curWorker.status?' selected':''}>${v.label}</option>`).join('');
+  $('mwv-note').value=curWorker.notes||'';
+  hide('map-site-view');show('map-worker-view');
+}
+function closeWorker(){hide('map-worker-view');show('map-site-view');}
+function saveStatus(){
+  if(!curWorker)return;
+  const ns=$('mwv-status').value,nn=$('mwv-note').value;
+  const all=Object.values(curSite.workers).flat();const w=all.find(x=>x.id===curWorker.id);if(w){w.status=ns;w.notes=nn;curWorker=w;}
+  renderMapTable();const t=$('t-mwv');t.textContent='Status updated → '+PSS[ns].label;t.style.display='block';setTimeout(()=>t.style.display='none',2400);
+}
+
+function buildCampCards(){$('camp-cards').innerHTML=CAMPS.map(c=>`<div class="ccamp" onclick="openCamp(${c.id})"><div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:5px"><div style="font-size:13px;font-weight:700;color:var(--t1);flex:1;margin-right:7px">${c.title}</div><span class="ctb ${c.typeCls}">${c.typeLabel}</span></div><div class="pb"><div class="pf" style="width:${Math.round(c.sigs/c.target*100)}%"></div></div><div style="display:flex;justify-content:space-between;align-items:center"><div class="pl">${c.sigs} / ${c.target}</div>${c.status==='won'?'<span class="badge b-won">WON</span>':''}</div></div>`).join('');}
+function openCamp(id){
+  const c=CAMPS.find(x=>x.id===id);
+  ['cv-list','cv-builder','cv-petition','cv-escalation'].forEach(i=>{const e=$(i);if(e)hide(i);});
+  show('cv-detail');$('cd-sigs').textContent=c.sigs;$('cd-tgt').textContent=c.target;$('cd-bar').style.width=Math.round(c.sigs/c.target*100)+'%';
+}
+function hideCampDetail(){hide('cv-detail');show('cv-list');}
+function showCB(){
+  hide('cv-list');show('cv-builder');cbNext(1);
+  selTools={petition:true,tracker:false,sms:false,leaflet:false,pledge:false,escalation:false};
+  document.querySelectorAll('.tc').forEach(t=>{t.classList.remove('on');if(t.id==='tool-petition')t.classList.add('on');});
+}
+function hideCB(){hide('cv-builder');show('cv-list');}
+function cbNext(n){[1,2,3].forEach(i=>hide('cb'+i));show('cb'+n);if(n===2)updateCb2Next();}
+function selCT(el,t){document.querySelectorAll('#ct-chips .chip').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');ctVal=t;}
+function launchCamp(){
+  const ttl=$('cb-ttl').value||'New campaign';const tgt=parseInt($('cb-tgt').value)||50;
+  const tc={pet:{label:'Petition',cls:'ct-pet'},act:{label:'Day of action',cls:'ct-act'},lob:{label:'Negotiation',cls:'ct-lob'},med:{label:'Media',cls:'ct-med'},str:{label:'Work stoppage',cls:'ct-str'}};
+  CAMPS.unshift({id:Date.now(),title:ttl,type:ctVal,typeLabel:tc[ctVal]?.label||ctVal,typeCls:tc[ctVal]?.cls||'ct-pet',sigs:0,target:tgt,status:'active'});
+  buildCampCards();hideCB();
+  setTimeout(()=>{const t=$('t-camp');t.textContent='"'+ttl+'" launched!';t.style.display='block';setTimeout(()=>t.style.display='none',2500);},100);
+}
+
+function buildEvents(newTitle,newDate,newTime,newLoc){
+  const evts=[{d:'19',m:'APR',t:'General meeting',s:'Depot hall, 9:00am · All members'},{d:'22',m:'APR',t:'Delegate committee',s:'Zone 3 office, 6:00pm · Delegates'},{d:'3',m:'MAY',t:'Management negotiation',s:'Admin building, 10:00am'}];
+  if(newTitle){const d=new Date(newDate||Date.now());evts.unshift({d:d.getDate().toString(),m:d.toLocaleString('en',{month:'short'}).toUpperCase(),t:newTitle,s:(newLoc||'Location TBC')+(newTime?' · '+newTime:'')});}
+  $('ev-list').innerHTML=evts.map((e,i,arr)=>`<div style="display:flex;gap:9px;padding:9px 0;border-bottom:${i<arr.length-1?'1px solid var(--bord)':'none'}"><div style="width:36px;flex-shrink:0;text-align:center;background:var(--psi);color:#fff;border-radius:8px;padding:4px"><div style="font-size:17px;font-weight:700;line-height:1">${e.d}</div><div style="font-size:9px;opacity:.8">${e.m}</div></div><div><div style="font-size:13px;font-weight:600;color:var(--t1)">${e.t}</div><div style="font-size:11px;color:var(--t2);margin-top:2px">${e.s}</div></div></div>`).join('');
+}
+
+function buildCoreFlds(){$('core-flds').innerHTML=[{l:'Full name',t:'text'},{l:'Phone number',t:'tel'},{l:'Home address',t:'textarea'},{l:'Worker / ID number',t:'text'},{l:'Job title / grade',t:'text'},{l:'Employment basis',t:'select'}].map(f=>`<div style="display:flex;align-items:center;gap:7px;padding:7px 9px;background:var(--bg2);border-radius:var(--r);margin-bottom:5px"><div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--t1)">${f.l}</div><div style="font-size:10px;color:var(--t2)">${f.t}</div></div><span style="font-size:9px;padding:1px 5px;border-radius:4px;background:#FDECEA;color:#7A0019;font-weight:700">Required</span></div>`).join('');}
+function buildOptFlds(){$('opt-flds').innerHTML=[{l:'Date of birth',on:true},{l:'Gender',on:true},{l:'Email address',on:true},{l:'Emergency contact',on:false}].map(f=>`<div class="trow"><div><div style="font-size:12px;color:var(--t1)">${f.l}</div></div><label class="tgl"><input type="checkbox" ${f.on?'checked':''}><div class="tgl-t"></div><div class="tgl-th"></div></label></div>`).join('');}
+function saveProfStatus(){
+  const ns=$('prof-status').value,nn=$('prof-note').value;
+  const allM=MEMBERS_DATA[CUK]||[];const m=allM.find(x=>x.id===profileWorkerId);if(m){m.role=ns;m.notes=nn;}
+  SITES.forEach(s=>Object.values(s.workers).flat().forEach(w=>{if(w.id===profileWorkerId){w.status=ns;w.notes=nn;}}));
+  const t=$('t-prof');t.textContent='Status updated → '+PSS[ns].label;t.style.display='block';setTimeout(()=>t.style.display='none',2400);
+}
+
+// Login now also triggers union settings build
+function login(t){
+  CU=USERS[t];
+  document.querySelectorAll('.screen').forEach(s=>{s.style.display='none';s.classList.remove('active')});
+  if(CU.role==='admin'){
+    $('sc-admin').style.display='block';$('sc-admin').classList.add('active');
+    buildAdmin();buildSettings();
+  } else {
+    CUK=CU.uk;const u=UNIONS[CUK];
+    $('sc-union').style.display='block';$('sc-union').classList.add('active');
+    $('u-title').textContent=u.name;
+    $('u-sub').textContent=CU.name+' · '+(CU.role==='delegate'?'Delegate':'Organiser');
+    $('u-rb').textContent=CU.role==='delegate'?'Delegate':'Organiser';
+    $('form-uname').value=u.name;
+    buildDash();buildMembers();buildCampCards();buildSiteList();buildEvents();buildCoreFlds();buildOptFlds();buildUnionSettings();
+  }
+}
+
+// Toggle campaign action on a worker (from profile page)
+function toggleAction(wid, key, row){
+  const w = getAllWorkers().find(x=>x.id===wid);
+  if(!w||!w.actions)return;
+  w.actions[key] = !w.actions[key];
+  // Sync back into MEMBERS_DATA and SITES
+  const m=(MEMBERS_DATA[CUK]||[]).find(x=>x.id===wid);
+  if(m&&m.actions)m.actions[key]=w.actions[key];
+  SITES.forEach(s=>Object.values(s.workers).flat().forEach(sw=>{if(sw.id===wid&&sw.actions)sw.actions[key]=w.actions[key];}));
+  // Update the row UI
+  const done = w.actions[key];
+  const span = document.getElementById('act-'+wid+'-'+key);
+  if(span){
+    span.style.color = done?'#1B5E20':'#bdbdbd';
+    span.innerHTML = `<span style="width:24px;height:24px;border-radius:50%;background:${done?'#43A047':'#eee'};display:inline-flex;align-items:center;justify-content:center;border:1px solid ${done?'#43A047':'#ccc'};font-size:12px;color:#fff;flex-shrink:0">${done?'✓':''}</span>${done?'Done':'Not yet'}`;
+  }
+  // Update "actions taken" count in the summary
+  const ac=Object.values(w.actions).filter(Boolean).length;
+  const rows=document.querySelectorAll('.drow');
+  rows.forEach(r=>{if(r.querySelector('.dk')?.textContent==='Actions taken'){r.querySelector('.dv').textContent=ac+' of '+ACTIONS_DEF.length;}});
+  toast((done?'✓ Marked done: ':'Unmarked: ')+ACTIONS_DEF.find(a=>a.k===key)?.l);
+}
+
+// Toggle campaign action from map worker view
+function toggleActionMap(wid, key, row){
+  const all=Object.values(curSite.workers).flat();
+  const w=all.find(x=>x.id===wid);
+  if(!w||!w.actions)return;
+  w.actions[key]=!w.actions[key];
+  // Sync MEMBERS_DATA too
+  const m=(MEMBERS_DATA[CUK]||[]).find(x=>x.id===wid);
+  if(m&&m.actions)m.actions[key]=w.actions[key];
+  const done=w.actions[key];
+  const span=document.getElementById('mact-'+wid+'-'+key);
+  if(span){
+    span.style.color=done?'#1B5E20':'#bdbdbd';
+    span.innerHTML=`<span style="width:24px;height:24px;border-radius:50%;background:${done?'#43A047':'#eee'};display:inline-flex;align-items:center;justify-content:center;border:1px solid ${done?'#43A047':'#ccc'};font-size:12px;color:#fff;flex-shrink:0">${done?'✓':''}</span>${done?'Done':'Not yet'}`;
+  }
+  // Refresh map table dots in background
+  renderMapTable();
+  toast((done?'✓ Marked done: ':'Unmarked: ')+ACTIONS_DEF.find(a=>a.k===key)?.l);
+}
+
+// ── ADMIN & SETTINGS FUNCTIONS ───────────────────────────────────
+
+function buildSettings(){
+  const container=$('settings-sections');if(!container)return;
+  container.innerHTML=Object.entries(REF).map(([key,data])=>`<div class="sec-card"><div class="sec-hdr" onclick="toggleSec('${key}')"><div><div style="font-size:13px;font-weight:600;color:var(--t1)">${data.label}</div><div style="font-size:11px;color:var(--t2)" id="smeta-${key}">${data.items.filter(i=>i.active).length} active</div></div><span style="font-size:16px;color:var(--t2);transition:transform .2s" id="schev-${key}">›</span></div><div class="sec-body" id="sbody-${key}"><div style="padding-top:10px" id="slist-${key}"></div><div class="add-inline"><input type="text" id="sadd-${key}" placeholder="Add..." onkeydown="if(event.key==='Enter')addRefItem('${key}')"><button class="btn-sm" style="background:var(--psi);color:#fff;border-color:var(--psi);flex-shrink:0" onclick="addRefItem('${key}')">Add</button></div></div></div>`).join('');
+  Object.keys(REF).forEach(renderRefList);
+  populateRegDropdowns();
+}
+function renderRefList(key){
+  const data=REF[key];const active=data.items.filter(i=>i.active),archived=data.items.filter(i=>!i.active);
+  $('smeta-'+key).textContent=active.length+' active'+(archived.length?' · '+archived.length+' archived':'');
+  let html=active.map(item=>`<div class="ref-row"><span style="flex:1;font-size:13px;color:var(--t1)">${item.label}</span><div style="display:flex;gap:5px"><button class="btn-sm" onclick="editRefItem('${key}',${item.id})">Edit</button><button class="btn-sm-r" onclick="archiveRefItem('${key}',${item.id})">Archive</button></div></div>`).join('');
+  if(archived.length){html+=`<div style="font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.4px;margin-top:10px;margin-bottom:6px">Archived</div>`;html+=archived.map(item=>`<div class="ref-row" style="opacity:.5"><span style="flex:1;font-size:13px;color:var(--t1);text-decoration:line-through">${item.label}</span><button class="btn-sm" onclick="restoreRefItem('${key}',${item.id})">Restore</button></div>`).join('');}
+  $('slist-'+key).innerHTML=html;
+}
+function toggleSec(key){const body=$('sbody-'+key),chev=$('schev-'+key),open=body.classList.contains('open');body.classList.toggle('open',!open);chev.style.transform=open?'':'rotate(90deg)';}
+function addRefItem(key){const inp=$('sadd-'+key),val=inp.value.trim();if(!val)return;REF[key].items.push({id:nextRefId++,label:val,active:true});inp.value='';renderRefList(key);populateRegDropdowns();toastA('"'+val+'" added');}
+function editRefItem(key,id){const item=REF[key].items.find(i=>i.id===id);if(!item)return;const nv=prompt('Edit:',item.label);if(nv&&nv.trim()){item.label=nv.trim();renderRefList(key);toastA('Updated');}}
+function archiveRefItem(key,id){const item=REF[key].items.find(i=>i.id===id);if(item){item.active=false;renderRefList(key);populateRegDropdowns();toastA('"'+item.label+'" archived');}}
+function restoreRefItem(key,id){const item=REF[key].items.find(i=>i.id===id);if(item){item.active=true;renderRefList(key);populateRegDropdowns();toastA('"'+item.label+'" restored');}}
+function populateRegDropdowns(){const cs=$('reg-country'),ss=$('reg-sector');if(cs)cs.innerHTML=REF.countries.items.filter(i=>i.active).map(i=>`<option>${i.label}</option>`).join('');if(ss)ss.innerHTML=REF.sectors.items.filter(i=>i.active).map(i=>`<option>${i.label}</option>`).join('');}
+
+function buildAdmin(){
+  const asnap=$('a-snap');if(!asnap)return;
+  asnap.innerHTML=Object.values(UNIONS).map(u=>`<div style="display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--bord)"><div style="font-size:14px;flex-shrink:0;margin-right:2px">${u.flag}</div><div style="flex:1;font-size:12px;color:var(--t1)">${u.name.split(' ').slice(0,3).join(' ')}</div><div style="width:80px;height:5px;background:var(--bg2);border-radius:3px;overflow:hidden;flex-shrink:0"><div style="height:100%;background:var(--psi);border-radius:3px;width:${u.density}%"></div></div><div style="font-size:11px;font-weight:700;color:var(--psi);min-width:26px;text-align:right">${u.density}%</div></div>`).join('');
+  const bars=[{v:483,mx:600,c:'#C8102E'},{v:786,mx:1000,c:'#8B0000'},{v:192,mx:300,c:'#E63950'},{v:1461,mx:1800,c:'#1a1a1a'}];
+  $('a-comms').innerHTML=bars.map(b=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px"><div style="font-size:9px;font-weight:700;color:var(--t1)">${b.v}</div><div style="width:100%;background:var(--bg2);border-radius:2px 2px 0 0;height:50px;display:flex;align-items:flex-end"><div style="width:100%;height:${Math.round(b.v/b.mx*100)}%;background:${b.c};border-radius:2px 2px 0 0"></div></div></div>`).join('');
+  $('a-aff-list').innerHTML=Object.entries(UNIONS).map(([k,u])=>`<div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--bord);cursor:pointer" onclick="showAffDet('${k}')"><div style="width:30px;height:30px;border-radius:6px;background:${u.color};display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">${u.flag}</div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--t1)">${u.name}</div><div style="font-size:10px;color:var(--t2)">${u.country} · ${u.sector} · ${u.members} members</div></div><span class="badge" style="background:${u.color};color:${u.tc}">${u.density}%</span></div>`).join('');
+  $('a-density').innerHTML=Object.values(UNIONS).sort((a,b)=>b.density-a.density).map(u=>`<div style="display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--bord)"><div style="font-size:13px;flex-shrink:0">${u.flag}</div><div style="flex:1;font-size:11px;color:var(--t1)">${u.name.split(' ').slice(0,3).join(' ')}</div><div style="width:90px;height:5px;background:var(--bg2);border-radius:3px;overflow:hidden"><div style="height:100%;background:var(--psi);border-radius:3px;width:${u.density}%"></div></div><div style="font-size:11px;font-weight:700;color:var(--psi);min-width:28px;text-align:right">${u.density}%</div></div>`).join('');
+  $('a-wins').innerHTML=[{n:'Manila Health Workers',r:78},{n:'Colombo Port Workers',r:67},{n:'Dhaka Sanitation',r:60},{n:'Jakarta Garment',r:50},{n:'Dhaka Domestic',r:44},{n:'Kathmandu Construction',r:40}].map(w=>`<div style="display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--bord)"><div style="flex:1;font-size:11px;color:var(--t1)">${w.n}</div><div style="width:90px;height:5px;background:var(--bg2);border-radius:3px;overflow:hidden"><div style="height:100%;background:var(--psid);border-radius:3px;width:${w.r}%"></div></div><div style="font-size:11px;font-weight:700;color:var(--psid);min-width:28px;text-align:right">${w.r}%</div></div>`).join('');
+}
+function showAffDet(k){
+  const u=UNIONS[k];const d=$('a-aff-det');d.style.display='block';
+  d.innerHTML=`<div class="card"><div style="display:flex;align-items:center;gap:9px;margin-bottom:11px"><div style="width:34px;height:34px;border-radius:7px;background:${u.color};display:flex;align-items:center;justify-content:center;font-size:18px">${u.flag}</div><div><div style="font-size:14px;font-weight:700;color:var(--t1)">${u.name}</div><div style="font-size:11px;color:var(--t2)">${u.country} · ${u.sector}</div></div></div><div class="sg"><div class="st"><div class="sl">Members</div><div class="sv">${u.members}</div></div><div class="st"><div class="sl">Density</div><div class="sv">${u.density}%</div></div><div class="st"><div class="sl">Campaigns</div><div class="sv">${u.campaigns||1}</div></div><div class="st"><div class="sl">Delegates</div><div class="sv">${u.delegates||3}</div></div></div><div style="display:flex;gap:7px"><button class="btn btn-p" style="flex:1;font-size:12px;padding:8px" onclick="toastA('Opening ${u.name}...')">View full union</button><button class="btn btn-s" style="flex:1;font-size:12px;padding:8px" onclick="$('a-aff-det').style.display='none'">Close</button></div></div>`;
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+
+// init screens hidden
+document.querySelectorAll('.screen').forEach(s=>s.style.display=s.classList.contains('active')?'block':'none');
+</script>
+</body>
+</html>
